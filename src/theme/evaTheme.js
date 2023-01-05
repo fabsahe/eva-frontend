@@ -1,0 +1,24 @@
+import { createTheme } from '@mui/material/styles'
+
+const evaTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#3974A6'
+    },
+    secondary: {
+      main: '#BC2423'
+    },
+    success: {
+      main: '#689689',
+      contrastText: '#fff'
+    },
+    info: {
+      main: '#3c91e6'
+    },
+    error: {
+      main: '#c3423f'
+    }
+  }
+})
+
+export default evaTheme
