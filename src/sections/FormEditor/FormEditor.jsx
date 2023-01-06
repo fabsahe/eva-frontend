@@ -28,7 +28,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { es } from 'dayjs/locale/es'
 import { useSnackbar } from 'notistack'
-import { NOTI_ERROR } from '../../constants/notiConstants'
+import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
 import dayjs from 'dayjs'
 import formService from '@/services/formService'
 
@@ -46,6 +46,11 @@ const today = dayjs().format('YYYY-MM-DD')
 const titleList = {
   create: 'Nuevo cuestionario',
   clone: 'Nuevo cuestionario (clon)',
+  edit: 'Editar cuestionario'
+}
+const modeSubmitButtons = {
+  create: 'Crear cuestionario',
+  clone: 'Clonar cuestionario',
   edit: 'Editar cuestionario'
 }
 
@@ -72,6 +77,7 @@ export default function FormEditor ({ mode }) {
   const formId = params.id
 
   const editorTitle = titleList[mode] || ''
+  const submitButtonText = modeSubmitButtons[mode] || 'enviar'
   const careerEntries = careerList.map(career => [career._id, career.nombre])
   const careerNames = Object.fromEntries(careerEntries)
   const yearOptions = periodList.map(item => item.año)
@@ -86,15 +92,25 @@ export default function FormEditor ({ mode }) {
     getCareers()
     getPeriods()
 
-    if (mode === 'clone') {
-      getForm()
+    if (mode === 'clone' || mode === 'edit') {
+      getForm(mode)
     }
   }, [])
 
-  const getForm = async () => {
+  const getForm = async (mode) => {
     const response = await formService.getOneForm(formId)
     if (response.status === 'OK') {
-      console.log(response.data)
+      const data = response.data
+      const appendTitle = mode === 'clone' ? '(clon)' : ''
+      setTitle(`${data.titulo} ${appendTitle}`)
+      setCareers(data.carreras.map(carrera => carrera._id))
+      setYear(data.año)
+      setPeriod(data.periodo)
+
+      setStartDate(dayjs(data.fechaInicio).format('YYYY-MM-DD'))
+      setEndDate(dayjs(data.fechaFin).format('YYYY-MM-DD'))
+
+      setForm(data.items)
     }
   }
 
@@ -111,7 +127,6 @@ export default function FormEditor ({ mode }) {
   const getPeriods = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/periods')
-      // console.log(response.data.data)
       setPeriodList(response.data.data)
     } catch (err) {
       console.log(err)
@@ -124,8 +139,7 @@ export default function FormEditor ({ mode }) {
   const handleChangeYear = (event) => {
     setYear(event.target.value)
     const res = periodList.find(item => item.año === year)
-    console.log({ res })
-    console.log({ periodOptions })
+    //  console.log({ res })
   }
   const handleChangePeriod = (event) => {
     setPeriod(event.target.value)
@@ -143,7 +157,7 @@ export default function FormEditor ({ mode }) {
     }
     if (event.target.value === 'options') {
       setOptions(prevOptions => [...prevOptions, {
-        id: 1,
+        _id: 1,
         texto: 'Texto de la opción'
       }])
     }
@@ -161,13 +175,12 @@ export default function FormEditor ({ mode }) {
       console.log('Faltan datos')
       return
     }
-    console.log(options)
     if (options.length > 0 && options.at(-1).texto === 'Texto de la opción') {
       options.pop()
     }
     if (form.length === 0) {
       setForm(prevForm => [...prevForm, {
-        id: 0,
+        _id: 0,
         pregunta: question,
         opciones: options
       }]
@@ -177,18 +190,18 @@ export default function FormEditor ({ mode }) {
       setOptions([])
       return
     }
-    const id = form.at(-1).id + 1
-    setForm(prevForm => [...prevForm, { id, pregunta: question, opciones: options }])
+    const _id = form.at(-1)._id + 1
+    setForm(prevForm => [...prevForm, { _id, pregunta: question, opciones: options }])
     setQuestion('')
     setType('')
     setOptions([])
   }
 
   const addOption = () => {
-    const lastId = options.at(-1).id
+    const lastId = options.at(-1)._id
     const newId = lastId + 1
     setOptions(prevOptions => [...prevOptions, {
-      id: newId,
+      _id: newId,
       texto: 'Texto de la opción'
     }])
   }
@@ -203,7 +216,7 @@ export default function FormEditor ({ mode }) {
     )
   }
 
-  const postForm = async (form) => {
+  const createNewForm = async (form) => {
     try {
       const config = {
         headers: {
@@ -212,14 +225,28 @@ export default function FormEditor ({ mode }) {
       }
       const response = await axios.post('http://localhost:3001/api/forms', form, config)
       if (response.data.status === 'OK') {
-        setPostMessage(
-          'Se ha creado un nuevo formulario con id: '
-        )
-        setFormLink(`${response.data.data._id}`)
+        noti('Cuestionario creado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
       }
     } catch (error) {
-      setPostMessage(error.mesage)
+      noti(error.mesage, NOTI_ERROR)
+    }
+  }
+
+  const updateOneForm = async (form) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      const response = await axios.put(`http://localhost:3001/api/forms/${formId}`, form, config)
+      if (response.data.status === 'OK') {
+        noti('Cuestionario actualizado', NOTI_SUCCESS)
+        navigate('/dashboard/cuestionarios')
+      }
+    } catch (error) {
+      noti(error.mesage, NOTI_ERROR)
     }
   }
 
@@ -230,18 +257,27 @@ export default function FormEditor ({ mode }) {
       return
     }
 
+    const questions = form.map(item => ({
+      pregunta: item.pregunta,
+      opciones: item.opciones.map(op => ({ texto: op.texto }))
+    }))
+
     const newForm = {
       titulo: title,
       año: year,
       periodo: period,
       carreras: careers,
-      items: form,
+      items: questions,
       fechaInicio: typeof startDate === 'string' ? startDate : startDate.format('YYYY-MM-DD'),
       fechaFin: typeof endDate === 'string' ? endDate : endDate.format('YYYY-MM-DD')
     }
 
     // console.log(newForm)
-    postForm(newForm)
+    if (mode === 'create' || mode === 'clone') {
+      createNewForm(newForm)
+    } else if (mode === 'edit') {
+      updateOneForm(newForm)
+    }
   }
 
   return (
@@ -363,6 +399,7 @@ export default function FormEditor ({ mode }) {
                     setStartDate(newValue)
                   }}
                   renderInput={(params) => <TextField {...params} />}
+                  disablePast
                 />
                 <Box sx={{ my: 1 }}/>
                 <DatePicker
@@ -372,13 +409,14 @@ export default function FormEditor ({ mode }) {
                     setEndDate(newValue)
                   }}
                   renderInput={(params) => <TextField {...params} />}
+                  disablePast
                 />
               </LocalizationProvider>
             </Paper>
           </Grid>
 
           { form && form.map((item, index) => (
-            <Grid item key={item.id} xs={12} md={8} lg={8}>
+            <Grid item key={item._id} xs={12} md={8} lg={8}>
               <Paper
                 sx={{
                   p: 2,
@@ -406,8 +444,8 @@ export default function FormEditor ({ mode }) {
                           {
                             item.opciones.map((opcion) => (
                               <FormControlLabel
-                                key={opcion.id}
-                                value={opcion.id}
+                                key={opcion._id}
+                                value={opcion._id}
                                 control={<Radio />}
                                 label={opcion.texto} />
                             ))
@@ -467,13 +505,13 @@ export default function FormEditor ({ mode }) {
                 {
                   options && options.map((option) => (
                     <TextField
-                      key={option.id}
+                      key={option._id}
                       hiddenLabel
                       variant="outlined"
                       placeholder="Texto de la opción"
                       sx={{ mb: 1 }}
                       onChange={
-                        (event) => handleChangeOptions(event, option.id)
+                        (event) => handleChangeOptions(event, option._id)
                       }
                       onKeyPress={e => e.key === 'Enter' && e.preventDefault()}
                     />
@@ -509,10 +547,10 @@ export default function FormEditor ({ mode }) {
           type="submit"
           fullWidth
           variant="contained"
-          color="success"
+          color="hookgreen"
           sx={{ mt: 3, mb: 2 }}
         >
-          Crear cuestionario
+          { submitButtonText }
         </Button>
       </Box>
 

@@ -16,7 +16,7 @@ export default function App () {
         <main>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/formulario/:formId" element={<FormVisualizer />} />
+            <Route path="/cuestionarios/:formId" element={<FormVisualizer />} />
             <Route element={<ProtectedRoutes />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/:section" element={<Dashboard />} />

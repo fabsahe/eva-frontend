@@ -12,6 +12,10 @@ const evaTheme = createTheme({
       main: '#689689',
       contrastText: '#fff'
     },
+    hookgreen: {
+      main: '#3b6a60',
+      contrastText: '#fff'
+    },
     info: {
       main: '#3c91e6'
     },
