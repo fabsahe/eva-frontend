@@ -1,10 +1,11 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
-import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import InputLabel from '@mui/material/InputLabel'
@@ -21,9 +22,15 @@ import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import Link from '@mui/material/Link'
 import axios from 'axios'
-import { CardContent } from '@mui/material'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { es } from 'dayjs/locale/es'
+import { useSnackbar } from 'notistack'
+import { NOTI_ERROR } from '../../constants/notiConstants'
+import dayjs from 'dayjs'
+import formService from '@/services/formService'
 
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -35,9 +42,16 @@ const MenuProps = {
     }
   }
 }
+const today = dayjs().format('YYYY-MM-DD')
+const titleList = {
+  create: 'Nuevo cuestionario',
+  clone: 'Nuevo cuestionario (clon)',
+  edit: 'Editar cuestionario'
+}
 
-export default function FormCreator () {
+export default function FormEditor ({ mode }) {
   const [careerList, setCareerList] = useState([])
+  const [periodList, setPeriodList] = useState([])
   const [careers, setCareers] = useState([])
   const [form, setForm] = useState([])
   const [question, setQuestion] = useState('')
@@ -49,9 +63,19 @@ export default function FormCreator () {
   const [period, setPeriod] = useState('')
   const [formLink, setFormLink] = useState('')
   const [token, setToken] = useState('')
+  const [startDate, setStartDate] = useState(today)
+  const [endDate, setEndDate] = useState(today)
 
+  const { enqueueSnackbar: noti } = useSnackbar()
+  const navigate = useNavigate()
+  const params = useParams()
+  const formId = params.id
+
+  const editorTitle = titleList[mode] || ''
   const careerEntries = careerList.map(career => [career._id, career.nombre])
   const careerNames = Object.fromEntries(careerEntries)
+  const yearOptions = periodList.map(item => item.año)
+  const periodOptions = periodList.find(item => item.año === year)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
@@ -60,12 +84,35 @@ export default function FormCreator () {
       setToken(user.data.token)
     }
     getCareers()
+    getPeriods()
+
+    if (mode === 'clone') {
+      getForm()
+    }
   }, [])
+
+  const getForm = async () => {
+    const response = await formService.getOneForm(formId)
+    if (response.status === 'OK') {
+      console.log(response.data)
+    }
+  }
 
   const getCareers = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/careers')
+      // console.log(response.data.data)
       setCareerList(response.data.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const getPeriods = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/periods')
+      // console.log(response.data.data)
+      setPeriodList(response.data.data)
     } catch (err) {
       console.log(err)
     }
@@ -76,6 +123,9 @@ export default function FormCreator () {
   }
   const handleChangeYear = (event) => {
     setYear(event.target.value)
+    const res = periodList.find(item => item.año === year)
+    console.log({ res })
+    console.log({ periodOptions })
   }
   const handleChangePeriod = (event) => {
     setPeriod(event.target.value)
@@ -110,6 +160,10 @@ export default function FormCreator () {
     if (question === '' || type === '') {
       console.log('Faltan datos')
       return
+    }
+    console.log(options)
+    if (options.length > 0 && options.at(-1).texto === 'Texto de la opción') {
+      options.pop()
     }
     if (form.length === 0) {
       setForm(prevForm => [...prevForm, {
@@ -156,12 +210,13 @@ export default function FormCreator () {
           Authorization: `Bearer ${token}`
         }
       }
-      const response = await axios.post('http://localhost:3001/api/form/create', form, config)
+      const response = await axios.post('http://localhost:3001/api/forms', form, config)
       if (response.data.status === 'OK') {
         setPostMessage(
           'Se ha creado un nuevo formulario con id: '
         )
         setFormLink(`${response.data.data._id}`)
+        navigate('/dashboard/cuestionarios')
       }
     } catch (error) {
       setPostMessage(error.mesage)
@@ -171,7 +226,7 @@ export default function FormCreator () {
   const handleSubmit = (event) => {
     event.preventDefault()
     if (form.length === 0) {
-      console.log('El cuestionario está vacío')
+      noti('El cuestionario está vacío', NOTI_ERROR)
       return
     }
 
@@ -180,14 +235,22 @@ export default function FormCreator () {
       año: year,
       periodo: period,
       carreras: careers,
-      items: form
+      items: form,
+      fechaInicio: typeof startDate === 'string' ? startDate : startDate.format('YYYY-MM-DD'),
+      fechaFin: typeof endDate === 'string' ? endDate : endDate.format('YYYY-MM-DD')
     }
+
+    // console.log(newForm)
     postForm(newForm)
   }
 
   return (
 
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+      >
         <Grid container spacing={3} >
           <Grid item xs={12} md={8} lg={8}>
             <Paper
@@ -198,7 +261,7 @@ export default function FormCreator () {
               }}
             >
               <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-                Nuevo cuestionario
+                { editorTitle }
               </Typography>
 
               <TextField
@@ -206,6 +269,7 @@ export default function FormCreator () {
                 label="Título"
                 variant="outlined"
                 fullWidth
+                required
                 sx={{ mb: 2 }}
                 value={title}
                 onChange={handleChangeTitle} />
@@ -227,6 +291,7 @@ export default function FormCreator () {
                     </Box>
                   )}
                   MenuProps={MenuProps}
+                  required
                 >
                   {careerList.map((career) => (
                     <MenuItem
@@ -239,133 +304,135 @@ export default function FormCreator () {
                 </Select>
               </FormControl>
 
-              <TextField
-                id="cuestionario-y"
-                label="Año"
-                variant="outlined"
-                sx={{ mb: 2, mr: 2 }}
-                value={year}
-                onChange={handleChangeYear}
-              />
+              <Grid container spacing={2}>
+                <Grid item md={6} lg={6}>
+                  <FormControl fullWidth>
+                    <InputLabel id="year-select-label">Año</InputLabel>
+                    <Select
+                      labelId="year-select-label"
+                      id="year-form-select"
+                      value={year}
+                      label="Año"
+                      onChange={handleChangeYear}
+                      required
+                    >
+                      {yearOptions && yearOptions.map(option => (
+                        <MenuItem key={option} value={option}>{option}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item md={6} lg={6}>
+                  <FormControl fullWidth>
+                    <InputLabel id="period-select-label">Periodo</InputLabel>
+                    <Select
+                      labelId="period-select-label"
+                      id="period-form-select"
+                      value={period}
+                      label="Periodo"
+                      onChange={handleChangePeriod}
+                      required
+                    >
+                      {periodOptions?.nombres && periodOptions.nombres.map(option => (
+                        <MenuItem key={option} value={option}>{option}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
 
-              <TextField
-                id="cuestionario-p"
-                label="Periodo"
-                variant="outlined"
-                sx={{ mb: 2 }}
-                value={period}
-                onChange={handleChangePeriod}
-              />
             </Paper>
           </Grid>
-        </Grid>
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            spacing: 1
-          }}
-        >
-          <Typography component="h1" variant="h5">
-            Nuevo cuestionario
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1, width: '100%' }}
-          >
-            <TextField
-              id="titulo-cuestionario"
-              label="Título"
-              variant="outlined"
-              fullWidth
-              sx={{ mb: 2 }}
-              value={title}
-              onChange={handleChangeTitle} />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="demo-multiple-chip-label">Carreras</InputLabel>
-              <Select
-                labelId="demo-multiple-chip-label"
-                id="demo-multiple-chip"
-                multiple
-                value={careers}
-                onChange={handleChange}
-                input={<OutlinedInput id="select-multiple-chip" label="Carreras" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={careerNames[value]} />
-                    ))}
-                  </Box>
-                )}
-                MenuProps={MenuProps}
+          <Grid item xs={12} md={4} lg={4}>
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
+                Configuración
+              </Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'es'}>
+                <DatePicker
+                  label="Fecha de inicio"
+                  value={startDate}
+                  onChange={(newValue) => {
+                    setStartDate(newValue)
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+                <Box sx={{ my: 1 }}/>
+                <DatePicker
+                  label="Fecha de finalización"
+                  value={endDate}
+                  onChange={(newValue) => {
+                    setEndDate(newValue)
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Paper>
+          </Grid>
+
+          { form && form.map((item, index) => (
+            <Grid item key={item.id} xs={12} md={8} lg={8}>
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
               >
-                {careerList.map((career) => (
-                  <MenuItem
-                    key={career._id}
-                    value={career._id}
-                  >
-                    {career.nombre}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField
-              id="cuestionario-y"
-              label="Año"
-              variant="outlined"
-              sx={{ mb: 2, mr: 2 }}
-              value={year}
-              onChange={handleChangeYear}
-            />
-
-            <TextField
-              id="cuestionario-p"
-              label="Periodo"
-              variant="outlined"
-              sx={{ mb: 2 }}
-              value={period}
-              onChange={handleChangePeriod}
-            />
-
-            <Divider />
-
-            <Typography component="h1" variant="h5" sx={{ my: 2 }}>
-              Preguntas
-            </Typography>
-
-            { form && form.map((item, index) => (
-              <Card key={item.id} variant="outlined" sx={{ mb: 2 }}>
-                <CardContent>
-                <Typography variant="h5" component="div">
+                <Typography variant="h6" component="div" sx={{ mb: 1 }}>
                   {`${index + 1} - ${item.pregunta}`}
                 </Typography>
                 {
-                  item.opciones && item.opciones.map((opcion) => (
-                    <Typography variant="body1" component="div" key={opcion.id}>
-                      {`🍍 ${opcion.texto}`}
-                    </Typography>
-                  )
-                  )
+                  item.opciones && item.opciones.length === 0
+                    ? <TextField
+                        fullWidth
+                        hiddenLabel
+                        variant="outlined"
+                        sx={{ mb: 1 }}
+                      />
+                    : <FormControl>
+                        <FormLabel id="demo-radio-buttons-group-label">Respuestas</FormLabel>
+                        <RadioGroup
+                          aria-labelledby="demo-radio-buttons-group-label"
+                          name="radio-buttons-group"
+                        >
+                          {
+                            item.opciones.map((opcion) => (
+                              <FormControlLabel
+                                key={opcion.id}
+                                value={opcion.id}
+                                control={<Radio />}
+                                label={opcion.texto} />
+                            ))
+                          }
+
+                        </RadioGroup>
+                      </FormControl>
                 }
-                </CardContent>
-              </Card>
-            )) }
+              </Paper>
+            </Grid>
 
-            <Button
-              variant="outlined"
-              startIcon={<AddCircleOutlineIcon />}
-              onClick={newQuestion}
+          )) }
+
+          <Grid item xs={12} md={8} lg={8}>
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column'
+              }}
             >
-              Nueva pregunta
-            </Button>
+              <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
+                Agregar pregunta
+              </Typography>
 
-            <Box sx={{ my: 2 }}>
               <TextField
                 fullWidth
                 hiddenLabel
@@ -375,6 +442,7 @@ export default function FormCreator () {
                 onChange={handleChangeQuestion}
                 value={question}
               />
+
               <FormControl>
                 <FormLabel id="demo-row-radio-buttons-group-label">Tipo</FormLabel>
                 <RadioGroup
@@ -395,7 +463,7 @@ export default function FormCreator () {
                 </Typography>
               )
               }
-              <Stack sx={{ width: '50%' }}>
+              <Stack sx={{ width: '100%' }}>
                 {
                   options && options.map((option) => (
                     <TextField
@@ -419,38 +487,60 @@ export default function FormCreator () {
                     variant="outlined"
                     startIcon={<AddCircleOutlineIcon />}
                     onClick={addOption}
+                    sx={{ mt: 1, mb: 1 }}
                   >
                     Agregar opción
                   </Button>
                 )
               }
 
-            </Box>
+              <Button
+                variant="contained"
+                startIcon={<AddCircleOutlineIcon />}
+                onClick={newQuestion}
+              >
+                Agregar pregunta
+              </Button>
+            </Paper>
+          </Grid>
+        </Grid>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Crear
-            </Button>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="success"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Crear cuestionario
+        </Button>
+      </Box>
 
-            <Typography variant="h6" component="div" sx={{ mb: 0 }}>
-              {postMessage}
-            </Typography>
-            <Link
-              component={RouterLink}
-              to={`formulario/${formLink}`}
-            >
-              <Typography variant="h6" component="div" sx={{ mb: 4 }}>
-                {formLink}
-              </Typography>
-            </Link>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          spacing: 1
+        }}
+      >
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={{ mt: 1, width: '100%' }}
+        >
+          <Divider />
+          <Box sx={{ my: 2 }}>
           </Box>
         </Box>
-
-      </Container>
-
+      </Box>
+    </Container>
   )
+}
+
+FormEditor.propTypes = {
+  mode: PropTypes.string
 }

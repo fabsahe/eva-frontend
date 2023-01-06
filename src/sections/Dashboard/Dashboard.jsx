@@ -14,13 +14,13 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import MenuIcon from '@mui/icons-material/Menu'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import MainListItems from './MainListItems'
-import FormsList from './FormsList'
-import FormEditor from './FormEditor'
-import UsersList from './UsersList'
+import FormList from '@/sections/FormList/FormList'
+import FormEditor from '@/sections/FormEditor/FormEditor'
+import UserList from '@/sections/UserList/UserList'
 import InfoCard from './InfoCard'
-import AccountMenu from './layout/AccountMenu'
-import Logo from '../images/utm-header.jpg'
+import AccountMenu from './AccountMenu'
+import MainListItems from './MainListItems'
+import Logo from '@/assets/images/utm-header.jpg'
 
 const drawerWidth = 240
 
@@ -71,17 +71,15 @@ const Drawer = styled(MuiDrawer, {
 
 // const mdTheme = createTheme();
 
-function getSection (section) {
-  switch (section) {
-    case 'cuestionarios':
-      return <FormsList />
-    case 'nuevo-cuestionario':
-      return <FormEditor />
-    case 'users':
-      return <UsersList />
-    default:
-      return <p>Default</p>
+function getSection (name) {
+  const sections = {
+    cuestionarios: <FormList />,
+    'nuevo-cuestionario': <FormEditor mode="create"/>,
+    'editar-cuestionario': <FormEditor mode="edit"/>,
+    'clonar-cuestionario': <FormEditor mode="clone"/>,
+    usuarios: <UserList />
   }
+  return sections[name] || <p>Default</p>
 }
 
 export default function Dashboard () {

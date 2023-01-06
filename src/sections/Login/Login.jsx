@@ -14,7 +14,7 @@ import Container from '@mui/material/Container'
 import Alert from '@mui/material/Alert'
 import EmailField from './inputs/EmailField'
 import PasswordField from './inputs/PasswordField'
-import loginService from '../services/login'
+import loginService from '@/services/loginService'
 
 export default function Login () {
   const [email, setEmail] = useState('')

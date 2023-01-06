@@ -2,12 +2,12 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material/styles'
 import { SnackbarProvider } from 'notistack'
-import evaTheme from './theme/evaTheme'
-import snackbarProps from './utils/snackbarProps'
-import ProtectedRoutes from './components/routes/ProtectedRoutes'
-import FormVisualizer from './components/FormVisualizer'
-import Login from './components/Login'
-import Dashboard from './components/Dashboard'
+import evaTheme from '@/theme/evaTheme'
+import snackbarProps from '@/utils/snackbarProps'
+import ProtectedRoutes from '@/routes/ProtectedRoutes'
+import FormVisualizer from '@/sections/FormVisualizer/FormVisualizer'
+import Dashboard from '@/sections/Dashboard/Dashboard'
+import Login from '@/sections/Login/Login'
 
 export default function App () {
   return (
@@ -20,6 +20,7 @@ export default function App () {
             <Route element={<ProtectedRoutes />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/:section" element={<Dashboard />} />
+              <Route path="/dashboard/:section/:id" element={<Dashboard />} />
             </Route>
           </Routes>
         </main>

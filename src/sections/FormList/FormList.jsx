@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
@@ -14,6 +15,8 @@ import axios from 'axios'
 export default function FormsList () {
   const [forms, setForms] = useState([])
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     getAllForms()
   }, [])
@@ -22,7 +25,7 @@ export default function FormsList () {
     try {
       const response = await axios.get('http://localhost:3001/api/forms')
       const data = response.data.data
-      console.log(data)
+      // console.log(data)
       setForms(data)
     } catch (err) {
       console.log(err)
@@ -69,10 +72,19 @@ export default function FormsList () {
                   </Typography>
                 </Grid>
                 <Grid item md={3} lg={3}>
-                  <Button variant="outlined" startIcon={<FileCopyIcon />} sx={{ mr: 1 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<FileCopyIcon />}
+                    sx={{ mr: 1 }}
+                    onClick={() => navigate(`/dashboard/clonar-cuestionario/${form._id}`)}
+                  >
                     Clonar
                   </Button>
-                  <Button variant="outlined" startIcon={<EditIcon />}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<EditIcon />}
+                    onClick={() => navigate(`/dashboard/editar-cuestionario/${form._id}`)}
+                  >
                     Editar
                   </Button>
                 </Grid>
