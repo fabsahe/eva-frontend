@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -26,11 +25,12 @@ import axios from 'axios'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+// eslint-disable-next-line no-unused-vars
 import { es } from 'dayjs/locale/es'
 import { useSnackbar } from 'notistack'
-import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
 import dayjs from 'dayjs'
-import formService from '@/services/formService'
+import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
+import formService from '../../services/formService'
 
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -51,10 +51,10 @@ const titleList = {
 const modeSubmitButtons = {
   create: 'Crear cuestionario',
   clone: 'Clonar cuestionario',
-  edit: 'Editar cuestionario'
+  edit: 'Actualizar cuestionario'
 }
 
-export default function FormEditor ({ mode }) {
+export default function FormEditor({ mode }) {
   const [careerList, setCareerList] = useState([])
   const [periodList, setPeriodList] = useState([])
   const [careers, setCareers] = useState([])
@@ -62,14 +62,14 @@ export default function FormEditor ({ mode }) {
   const [question, setQuestion] = useState('')
   const [type, setType] = useState('')
   const [options, setOptions] = useState([])
-  const [postMessage, setPostMessage] = useState('')
   const [title, setTitle] = useState('')
   const [year, setYear] = useState('')
   const [period, setPeriod] = useState('')
-  const [formLink, setFormLink] = useState('')
   const [token, setToken] = useState('')
   const [startDate, setStartDate] = useState(today)
   const [endDate, setEndDate] = useState(today)
+  const [questionMode, setQuestionMode] = useState('new')
+  const [questionToEdit, setQuestionToEdit] = useState(null)
 
   const { enqueueSnackbar: noti } = useSnackbar()
   const navigate = useNavigate()
@@ -78,46 +78,16 @@ export default function FormEditor ({ mode }) {
 
   const editorTitle = titleList[mode] || ''
   const submitButtonText = modeSubmitButtons[mode] || 'enviar'
-  const careerEntries = careerList.map(career => [career._id, career.nombre])
+  const careerEntries = careerList.map((career) => [career._id, career.nombre])
   const careerNames = Object.fromEntries(careerEntries)
-  const yearOptions = periodList.map(item => item.año)
-  const periodOptions = periodList.find(item => item.año === year)
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setToken(user.data.token)
-    }
-    getCareers()
-    getPeriods()
-
-    if (mode === 'clone' || mode === 'edit') {
-      getForm(mode)
-    }
-  }, [])
-
-  const getForm = async (mode) => {
-    const response = await formService.getOneForm(formId)
-    if (response.status === 'OK') {
-      const data = response.data
-      const appendTitle = mode === 'clone' ? '(clon)' : ''
-      setTitle(`${data.titulo} ${appendTitle}`)
-      setCareers(data.carreras.map(carrera => carrera._id))
-      setYear(data.año)
-      setPeriod(data.periodo)
-
-      setStartDate(dayjs(data.fechaInicio).format('YYYY-MM-DD'))
-      setEndDate(dayjs(data.fechaFin).format('YYYY-MM-DD'))
-
-      setForm(data.items)
-    }
-  }
+  const yearOptions = periodList.map((item) => item.año)
+  const periodOptions = periodList.find((item) => item.año === year)
+  const questionModeText =
+    questionMode === 'new' ? 'Agregar pregunta' : 'Actualizar pregunta'
 
   const getCareers = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/careers')
-      // console.log(response.data.data)
       setCareerList(response.data.data)
     } catch (err) {
       console.log(err)
@@ -133,13 +103,42 @@ export default function FormEditor ({ mode }) {
     }
   }
 
+  const getForm = async () => {
+    const response = await formService.getOneForm(formId)
+    if (response.status === 'OK') {
+      const { data } = response
+      const appendTitle = mode === 'clone' ? '(clon)' : ''
+      setTitle(`${data.titulo} ${appendTitle}`)
+      setCareers(data.carreras.map((carrera) => carrera._id))
+      setYear(data.año)
+      setPeriod(data.periodo)
+
+      setStartDate(dayjs(data.fechaInicio).format('YYYY-MM-DD'))
+      setEndDate(dayjs(data.fechaFin).format('YYYY-MM-DD'))
+
+      setForm(data.items)
+    }
+  }
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setToken(user.data.token)
+    }
+    getCareers()
+    getPeriods()
+
+    if (mode === 'clone' || mode === 'edit') {
+      getForm()
+    }
+  }, [])
+
   const handleChangeTitle = (event) => {
     setTitle(event.target.value)
   }
   const handleChangeYear = (event) => {
     setYear(event.target.value)
-    const res = periodList.find(item => item.año === year)
-    //  console.log({ res })
   }
   const handleChangePeriod = (event) => {
     setPeriod(event.target.value)
@@ -156,10 +155,13 @@ export default function FormEditor ({ mode }) {
       return
     }
     if (event.target.value === 'options') {
-      setOptions(prevOptions => [...prevOptions, {
-        _id: 1,
-        texto: 'Texto de la opción'
-      }])
+      setOptions((prevOptions) => [
+        ...prevOptions,
+        {
+          _id: 1,
+          texto: ''
+        }
+      ])
     }
   }
 
@@ -172,26 +174,31 @@ export default function FormEditor ({ mode }) {
 
   const newQuestion = () => {
     if (question === '' || type === '') {
-      console.log('Faltan datos')
+      noti('Faltan datos')
       return
     }
     if (options.length > 0 && options.at(-1).texto === 'Texto de la opción') {
       options.pop()
     }
     if (form.length === 0) {
-      setForm(prevForm => [...prevForm, {
-        _id: 0,
-        pregunta: question,
-        opciones: options
-      }]
-      )
+      setForm((prevForm) => [
+        ...prevForm,
+        {
+          _id: 0,
+          pregunta: question,
+          opciones: options
+        }
+      ])
       setQuestion('')
       setType('')
       setOptions([])
       return
     }
     const _id = form.at(-1)._id + 1
-    setForm(prevForm => [...prevForm, { _id, pregunta: question, opciones: options }])
+    setForm((prevForm) => [
+      ...prevForm,
+      { _id, pregunta: question, opciones: options }
+    ])
     setQuestion('')
     setType('')
     setOptions([])
@@ -200,10 +207,13 @@ export default function FormEditor ({ mode }) {
   const addOption = () => {
     const lastId = options.at(-1)._id
     const newId = lastId + 1
-    setOptions(prevOptions => [...prevOptions, {
-      _id: newId,
-      texto: 'Texto de la opción'
-    }])
+    setOptions((prevOptions) => [
+      ...prevOptions,
+      {
+        _id: newId,
+        texto: ''
+      }
+    ])
   }
 
   const handleChange = (event) => {
@@ -216,14 +226,18 @@ export default function FormEditor ({ mode }) {
     )
   }
 
-  const createNewForm = async (form) => {
+  const createNewForm = async (formData) => {
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
-      const response = await axios.post('http://localhost:3001/api/forms', form, config)
+      const response = await axios.post(
+        'http://localhost:3001/api/forms',
+        formData,
+        config
+      )
       if (response.data.status === 'OK') {
         noti('Cuestionario creado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
@@ -233,14 +247,18 @@ export default function FormEditor ({ mode }) {
     }
   }
 
-  const updateOneForm = async (form) => {
+  const updateOneForm = async (formData) => {
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
-      const response = await axios.put(`http://localhost:3001/api/forms/${formId}`, form, config)
+      const response = await axios.put(
+        `http://localhost:3001/api/forms/${formId}`,
+        formData,
+        config
+      )
       if (response.data.status === 'OK') {
         noti('Cuestionario actualizado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
@@ -257,9 +275,9 @@ export default function FormEditor ({ mode }) {
       return
     }
 
-    const questions = form.map(item => ({
+    const questions = form.map((item) => ({
       pregunta: item.pregunta,
-      opciones: item.opciones.map(op => ({ texto: op.texto }))
+      opciones: item.opciones.map((op) => ({ texto: op.texto }))
     }))
 
     const newForm = {
@@ -268,8 +286,12 @@ export default function FormEditor ({ mode }) {
       periodo: period,
       carreras: careers,
       items: questions,
-      fechaInicio: typeof startDate === 'string' ? startDate : startDate.format('YYYY-MM-DD'),
-      fechaFin: typeof endDate === 'string' ? endDate : endDate.format('YYYY-MM-DD')
+      fechaInicio:
+        typeof startDate === 'string'
+          ? startDate
+          : startDate.format('YYYY-MM-DD'),
+      fechaFin:
+        typeof endDate === 'string' ? endDate : endDate.format('YYYY-MM-DD')
     }
 
     // console.log(newForm)
@@ -280,14 +302,42 @@ export default function FormEditor ({ mode }) {
     }
   }
 
-  return (
+  const editQuestion = (questionId) => {
+    setQuestionMode('edit')
+    setQuestionToEdit(questionId)
+    const questionSelected = form.find((item) => item._id === questionId)
+    setQuestion(questionSelected.pregunta)
+    if (questionSelected.opciones.length === 0) {
+      setType('open')
+    } else {
+      setType('options')
+      setOptions(questionSelected.opciones)
+    }
+  }
 
+  const updateQuestion = () => {
+    setQuestionMode('new')
+    const questionSelected = form.find((item) => item._id === questionToEdit)
+    questionSelected.pregunta = question
+    questionSelected.opciones = options
+
+    setQuestion('')
+    setType('')
+    setOptions([])
+  }
+
+  const handleQuestion = () => {
+    if (questionMode === 'new') {
+      newQuestion()
+    } else if (questionMode === 'edit') {
+      updateQuestion()
+    }
+  }
+
+  return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-      >
-        <Grid container spacing={3} >
+      <Box component="form" onSubmit={handleSubmit}>
+        <Grid container spacing={3}>
           <Grid item xs={12} md={8} lg={8}>
             <Paper
               sx={{
@@ -297,7 +347,7 @@ export default function FormEditor ({ mode }) {
               }}
             >
               <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-                { editorTitle }
+                {editorTitle}
               </Typography>
 
               <TextField
@@ -308,7 +358,8 @@ export default function FormEditor ({ mode }) {
                 required
                 sx={{ mb: 2 }}
                 value={title}
-                onChange={handleChangeTitle} />
+                onChange={handleChangeTitle}
+              />
 
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel id="demo-multiple-chip-label">Carreras</InputLabel>
@@ -318,7 +369,9 @@ export default function FormEditor ({ mode }) {
                   multiple
                   value={careers}
                   onChange={handleChange}
-                  input={<OutlinedInput id="select-multiple-chip" label="Carreras" />}
+                  input={
+                    <OutlinedInput id="select-multiple-chip" label="Carreras" />
+                  }
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((value) => (
@@ -330,10 +383,7 @@ export default function FormEditor ({ mode }) {
                   required
                 >
                   {careerList.map((career) => (
-                    <MenuItem
-                      key={career._id}
-                      value={career._id}
-                    >
+                    <MenuItem key={career._id} value={career._id}>
                       {career.nombre}
                     </MenuItem>
                   ))}
@@ -352,9 +402,12 @@ export default function FormEditor ({ mode }) {
                       onChange={handleChangeYear}
                       required
                     >
-                      {yearOptions && yearOptions.map(option => (
-                        <MenuItem key={option} value={option}>{option}</MenuItem>
-                      ))}
+                      {yearOptions &&
+                        yearOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -369,14 +422,16 @@ export default function FormEditor ({ mode }) {
                       onChange={handleChangePeriod}
                       required
                     >
-                      {periodOptions?.nombres && periodOptions.nombres.map(option => (
-                        <MenuItem key={option} value={option}>{option}</MenuItem>
-                      ))}
+                      {periodOptions?.nombres &&
+                        periodOptions.nombres.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 </Grid>
               </Grid>
-
             </Paper>
           </Grid>
 
@@ -391,73 +446,97 @@ export default function FormEditor ({ mode }) {
               <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
                 Configuración
               </Typography>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'es'}>
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="es"
+              >
                 <DatePicker
                   label="Fecha de inicio"
                   value={startDate}
                   onChange={(newValue) => {
                     setStartDate(newValue)
                   }}
-                  renderInput={(params) => <TextField {...params} />}
+                  renderInput={(inputParams) => <TextField {...inputParams} />}
                   disablePast
                 />
-                <Box sx={{ my: 1 }}/>
+                <Box sx={{ my: 1 }} />
                 <DatePicker
                   label="Fecha de finalización"
                   value={endDate}
                   onChange={(newValue) => {
                     setEndDate(newValue)
                   }}
-                  renderInput={(params) => <TextField {...params} />}
+                  renderInput={(inputParams) => <TextField {...inputParams} />}
                   disablePast
                 />
               </LocalizationProvider>
             </Paper>
           </Grid>
 
-          { form && form.map((item, index) => (
-            <Grid item key={item._id} xs={12} md={8} lg={8}>
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                <Typography variant="h6" component="div" sx={{ mb: 1 }}>
-                  {`${index + 1} - ${item.pregunta}`}
-                </Typography>
-                {
-                  item.opciones && item.opciones.length === 0
-                    ? <TextField
-                        fullWidth
-                        hiddenLabel
-                        variant="outlined"
-                        sx={{ mb: 1 }}
-                      />
-                    : <FormControl>
-                        <FormLabel id="demo-radio-buttons-group-label">Respuestas</FormLabel>
-                        <RadioGroup
-                          aria-labelledby="demo-radio-buttons-group-label"
-                          name="radio-buttons-group"
+          {form &&
+            form.map((item, index) => (
+              <Grid item key={item._id} xs={12} md={8} lg={8}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  <Grid container>
+                    <Grid item md={10}>
+                      <Typography variant="h6" component="div" sx={{ mb: 1 }}>
+                        {`${index + 1} - ${item.pregunta}`}
+                      </Typography>
+                    </Grid>
+                    <Grid item md={2}>
+                      <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        alignItems="flex-end"
+                      >
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="success"
+                          onClick={() => editQuestion(item._id)}
                         >
-                          {
-                            item.opciones.map((opcion) => (
-                              <FormControlLabel
-                                key={opcion._id}
-                                value={opcion._id}
-                                control={<Radio />}
-                                label={opcion.texto} />
-                            ))
-                          }
+                          Editar
+                        </Button>
+                      </Box>
+                    </Grid>
+                  </Grid>
 
-                        </RadioGroup>
-                      </FormControl>
-                }
-              </Paper>
-            </Grid>
-
-          )) }
+                  {item.opciones && item.opciones.length === 0 ? (
+                    <TextField
+                      fullWidth
+                      hiddenLabel
+                      variant="outlined"
+                      sx={{ mb: 1 }}
+                    />
+                  ) : (
+                    <FormControl>
+                      <FormLabel id="demo-radio-buttons-group-label">
+                        Respuestas
+                      </FormLabel>
+                      <RadioGroup
+                        aria-labelledby="demo-radio-buttons-group-label"
+                        name="radio-buttons-group"
+                      >
+                        {item.opciones.map((opcion) => (
+                          <FormControlLabel
+                            key={opcion._id}
+                            value={opcion._id}
+                            control={<Radio />}
+                            label={opcion.texto}
+                          />
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                  )}
+                </Paper>
+              </Grid>
+            ))}
 
           <Grid item xs={12} md={8} lg={8}>
             <Paper
@@ -468,7 +547,7 @@ export default function FormEditor ({ mode }) {
               }}
             >
               <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
-                Agregar pregunta
+                {questionModeText}
               </Typography>
 
               <TextField
@@ -482,7 +561,9 @@ export default function FormEditor ({ mode }) {
               />
 
               <FormControl>
-                <FormLabel id="demo-row-radio-buttons-group-label">Tipo</FormLabel>
+                <FormLabel id="demo-row-radio-buttons-group-label">
+                  Tipo
+                </FormLabel>
                 <RadioGroup
                   row
                   aria-labelledby="demo-row-radio-buttons-group-label"
@@ -490,54 +571,61 @@ export default function FormEditor ({ mode }) {
                   value={type}
                   onChange={handleChangeType}
                 >
-                  <FormControlLabel value="open" control={<Radio />} label="Pregunta abierta" />
-                  <FormControlLabel value="options" control={<Radio />} label="Opciones" />
+                  <FormControlLabel
+                    value="open"
+                    control={<Radio />}
+                    label="Pregunta abierta"
+                  />
+                  <FormControlLabel
+                    value="options"
+                    control={<Radio />}
+                    label="Opciones"
+                  />
                 </RadioGroup>
               </FormControl>
 
-              { type === 'options' && (
+              {type === 'options' && (
                 <Typography component="h1" variant="subtitle2">
                   Opciones
                 </Typography>
-              )
-              }
+              )}
               <Stack sx={{ width: '100%' }}>
-                {
-                  options && options.map((option) => (
+                {options &&
+                  options.map((option) => (
                     <TextField
                       key={option._id}
                       hiddenLabel
                       variant="outlined"
                       placeholder="Texto de la opción"
                       sx={{ mb: 1 }}
-                      onChange={
-                        (event) => handleChangeOptions(event, option._id)
+                      value={option.texto}
+                      onChange={(event) =>
+                        handleChangeOptions(event, option._id)
                       }
-                      onKeyPress={e => e.key === 'Enter' && e.preventDefault()}
+                      onKeyPress={(e) =>
+                        e.key === 'Enter' && e.preventDefault()
+                      }
                     />
-                  ))
-                }
+                  ))}
               </Stack>
 
-              {
-                type === 'options' && (
-                  <Button
-                    variant="outlined"
-                    startIcon={<AddCircleOutlineIcon />}
-                    onClick={addOption}
-                    sx={{ mt: 1, mb: 1 }}
-                  >
-                    Agregar opción
-                  </Button>
-                )
-              }
+              {type === 'options' && (
+                <Button
+                  variant="outlined"
+                  startIcon={<AddCircleOutlineIcon />}
+                  onClick={addOption}
+                  sx={{ mt: 1, mb: 1 }}
+                >
+                  Agregar opción
+                </Button>
+              )}
 
               <Button
                 variant="contained"
                 startIcon={<AddCircleOutlineIcon />}
-                onClick={newQuestion}
+                onClick={handleQuestion}
               >
-                Agregar pregunta
+                {questionModeText}
               </Button>
             </Paper>
           </Grid>
@@ -550,7 +638,7 @@ export default function FormEditor ({ mode }) {
           color="hookgreen"
           sx={{ mt: 3, mb: 2 }}
         >
-          { submitButtonText }
+          {submitButtonText}
         </Button>
       </Box>
 
@@ -563,7 +651,6 @@ export default function FormEditor ({ mode }) {
           spacing: 1
         }}
       >
-
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -571,8 +658,7 @@ export default function FormEditor ({ mode }) {
           sx={{ mt: 1, width: '100%' }}
         >
           <Divider />
-          <Box sx={{ my: 2 }}>
-          </Box>
+          <Box sx={{ my: 2 }} />
         </Box>
       </Box>
     </Container>
@@ -580,5 +666,5 @@ export default function FormEditor ({ mode }) {
 }
 
 FormEditor.propTypes = {
-  mode: PropTypes.string
+  mode: PropTypes.string.isRequired
 }

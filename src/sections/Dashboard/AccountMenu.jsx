@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Menu from '@mui/material/Menu'
@@ -9,8 +10,7 @@ import Chip from '@mui/material/Chip'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import Logout from '@mui/icons-material/Logout'
 
-/* eslint react/prop-types: 0 */
-export default function AccountMenu ({ username }) {
+export default function AccountMenu({ username }) {
   const [anchorEl, setAnchorEl] = useState(null)
 
   const navigate = useNavigate()
@@ -100,4 +100,8 @@ export default function AccountMenu ({ username }) {
       </Menu>
     </>
   )
+}
+
+AccountMenu.propTypes = {
+  username: PropTypes.string.isRequired
 }

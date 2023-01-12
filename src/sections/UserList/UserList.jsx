@@ -5,28 +5,21 @@ import Typography from '@mui/material/Typography'
 
 import Paper from '@mui/material/Paper'
 
-export default function UsersList () {
+export default function UsersList() {
   return (
-    <>
-
-      <Container maxWidth="lg" sx={{ mb: 2 }}>
-
-          <Paper
-            sx={{
-              p: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              height: 520
-            }}
-          >
-
-            <Typography variant="h4" sx={{ mb: 2 }}>
-              Lista de usuarios
-            </Typography>
-
-          </Paper>
-
-      </Container>
-    </>
+    <Container maxWidth="lg" sx={{ mb: 2 }}>
+      <Paper
+        sx={{
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          height: 520
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          Lista de usuarios
+        </Typography>
+      </Paper>
+    </Container>
   )
 }

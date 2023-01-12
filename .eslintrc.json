@@ -5,11 +5,15 @@
     },
     "extends": [
         "plugin:react/recommended",
-        "standard"
+        "airbnb",
+        "plugin:prettier/recommended"
     ],
     "overrides": [
     ],
     "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
@@ -17,5 +21,9 @@
         "react"
     ],
     "rules": {
+        "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+        "no-underscore-dangle":  ["error", { "allow": ["_id"] }],
+        "react/jsx-props-no-spreading": "off",
+        "no-console": "off"
     }
 }

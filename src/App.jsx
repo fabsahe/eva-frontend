@@ -2,14 +2,14 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material/styles'
 import { SnackbarProvider } from 'notistack'
-import evaTheme from '@/theme/evaTheme'
-import snackbarProps from '@/utils/snackbarProps'
-import ProtectedRoutes from '@/routes/ProtectedRoutes'
-import FormVisualizer from '@/sections/FormVisualizer/FormVisualizer'
-import Dashboard from '@/sections/Dashboard/Dashboard'
-import Login from '@/sections/Login/Login'
+import evaTheme from './theme/evaTheme'
+import snackbarProps from './utils/snackbarProps'
+import ProtectedRoutes from './routes/ProtectedRoutes'
+import FormVisualizer from './sections/FormVisualizer/FormVisualizer'
+import Dashboard from './sections/Dashboard/Dashboard'
+import Login from './sections/Login/Login'
 
-export default function App () {
+export default function App() {
   return (
     <ThemeProvider theme={evaTheme}>
       <SnackbarProvider {...snackbarProps}>

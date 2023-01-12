@@ -10,7 +10,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import validator from 'validator'
 
 /* eslint react/prop-types: 0 */
-export default function PasswordField ({
+export default function PasswordField({
   label,
   password,
   setPassword,

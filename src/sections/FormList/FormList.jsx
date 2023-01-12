@@ -23,7 +23,7 @@ import EventIcon from '@mui/icons-material/Event'
 import axios from 'axios'
 import dayjs from 'dayjs'
 
-export default function FormsList () {
+export default function FormsList() {
   const [forms, setForms] = useState([])
   const [formUrl, setFormUrl] = useState('')
   const [open, setOpen] = useState(false)
@@ -31,19 +31,18 @@ export default function FormsList () {
 
   const navigate = useNavigate()
 
-  useEffect(() => {
-    getAllForms()
-  }, [])
-
   const getAllForms = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/forms')
-      const data = response.data.data
+      const { data } = response.data
       setForms(data)
     } catch (err) {
       console.log(err)
     }
   }
+  useEffect(() => {
+    getAllForms()
+  }, [])
 
   const handleChangeUrl = (event) => {
     setFormUrl(event.target.value)
@@ -72,31 +71,35 @@ export default function FormsList () {
   }
 
   return (
-    <>
-      <Container maxWidth="lg" sx={{ mt: 3 }}>
-        <Paper
-          sx={{
-            px: 2,
-            pt: 2,
-            pb: 5,
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          <Typography variant="h5" sx={{ mb: 2 }}>
-            Lista de cuestionarios
-          </Typography>
+    <Container maxWidth="lg" sx={{ mt: 3 }}>
+      <Paper
+        sx={{
+          px: 2,
+          pt: 2,
+          pb: 5,
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          Lista de cuestionarios
+        </Typography>
 
-          { forms && forms.map((form) => (
-            <Card sx={{ minWidth: 275 }} key={form._id} variant="outlined">
+        {forms &&
+          forms.map((form) => (
+            <Card
+              sx={{ minWidth: 275, mb: 1 }}
+              key={form._id}
+              variant="outlined"
+            >
               <CardContent>
                 <Grid container>
                   <Grid item md={10} lg={10}>
                     <Typography variant="h5" component="div" sx={{ mb: 0.5 }}>
                       {form.titulo}
                     </Typography>
-                    {
-                      form.carreras && form.carreras.map((carrera) => (
+                    {form.carreras &&
+                      form.carreras.map((carrera) => (
                         <Chip
                           key={carrera._id}
                           label={carrera.nombre}
@@ -104,17 +107,15 @@ export default function FormsList () {
                           variant="outlined"
                           sx={{ mr: 1 }}
                         />
-                      ))
-                    }
+                      ))}
                     <Typography variant="body2" sx={{ mt: 2 }}>
                       Creado por {form.user.name}
                     </Typography>
                     <Box component="div" sx={{ mt: 1, mb: -1 }}>
                       <Typography variant="body2">
                         <EventIcon sx={{ mr: 0.4, mb: -1 }} />
-                        { `Del ${dayjs(form.fechaInicio).format('DD-MM-YYYY')}
-                          al ${dayjs(form.fechaFin).format('DD-MM-YYYY')}`
-                        }
+                        {`Del ${dayjs(form.fechaInicio).format('DD-MM-YYYY')}
+                          al ${dayjs(form.fechaFin).format('DD-MM-YYYY')}`}
                       </Typography>
                     </Box>
                   </Grid>
@@ -124,7 +125,9 @@ export default function FormsList () {
                         variant="outlined"
                         startIcon={<FileCopyIcon />}
                         sx={{ mr: 1 }}
-                        onClick={() => navigate(`/dashboard/clonar-cuestionario/${form._id}`)}
+                        onClick={() =>
+                          navigate(`/dashboard/clonar-cuestionario/${form._id}`)
+                        }
                         fullWidth
                       >
                         Clonar
@@ -132,7 +135,9 @@ export default function FormsList () {
                       <Button
                         variant="outlined"
                         startIcon={<EditIcon />}
-                        onClick={() => navigate(`/dashboard/editar-cuestionario/${form._id}`)}
+                        onClick={() =>
+                          navigate(`/dashboard/editar-cuestionario/${form._id}`)
+                        }
                         fullWidth
                       >
                         Editar
@@ -146,41 +151,38 @@ export default function FormsList () {
                         Enlace
                       </Button>
                     </Stack>
-
                   </Grid>
                 </Grid>
               </CardContent>
             </Card>
-          )) }
-
-        </Paper>
-        <Dialog open={open} onClose={handleClose} fullWidth>
-          <DialogTitle>Enlace del cuestionario</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              value={formUrl}
-              onChange={handleChangeUrl}
-              margin="dense"
-              id="form-url"
-              type="text"
-              variant="outlined"
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancelar</Button>
-            <Button onClick={copyToClipboard}>Copiar enlace</Button>
-          </DialogActions>
-        </Dialog>
-        <Snackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          open={urlCopied}
-          autoHideDuration={2000}
-          onClose={handleCloseSnackbar}
-          message="Enlace copiado al portapapeles"
-        />
-      </Container>
-    </>
+          ))}
+      </Paper>
+      <Dialog open={open} onClose={handleClose} fullWidth>
+        <DialogTitle>Enlace del cuestionario</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            value={formUrl}
+            onChange={handleChangeUrl}
+            margin="dense"
+            id="form-url"
+            type="text"
+            variant="outlined"
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={copyToClipboard}>Copiar enlace</Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={urlCopied}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        message="Enlace copiado al portapapeles"
+      />
+    </Container>
   )
 }

@@ -6,7 +6,7 @@ import InputLabel from '@mui/material/InputLabel'
 import validator from 'validator'
 
 /* eslint react/prop-types: 0 */
-export default function EmailField ({
+export default function EmailField({
   email,
   setEmail,
   error,

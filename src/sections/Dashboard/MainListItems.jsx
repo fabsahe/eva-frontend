@@ -14,7 +14,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer'
 import AnalyticsIcon from '@mui/icons-material/Analytics'
 
-export default function MainListItems () {
+export default function MainListItems() {
   const [open, setOpen] = React.useState(true)
 
   const handleClick = () => {
@@ -71,7 +71,6 @@ export default function MainListItems () {
         </ListItemIcon>
         <ListItemText primary="Usuarios" />
       </ListItemButton>
-
     </>
   )
 }

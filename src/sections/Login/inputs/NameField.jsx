@@ -6,7 +6,7 @@ import InputLabel from '@mui/material/InputLabel'
 import validator from 'validator'
 
 /* eslint react/prop-types: 0 */
-export default function NameField ({ name, setName, error, setError, focus }) {
+export default function NameField({ name, setName, error, setError, focus }) {
   const [nameValidate, setNameValidate] = useState(false)
 
   const validateName = (e, source) => {
