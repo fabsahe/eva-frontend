@@ -13,7 +13,7 @@ import Container from '@mui/material/Container'
 import Alert from '@mui/material/Alert'
 import EmailField from './inputs/EmailField'
 import PasswordField from './inputs/PasswordField'
-import loginService from '../../services/loginService'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -24,34 +24,18 @@ export default function Login() {
   const [authenticated, setAuthenticated] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
+  const { login } = useAuth()
+
   const location = useLocation()
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (authenticated) {
-      navigate('/dashboard')
-    }
-  }, [authenticated])
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
-      const userResponse = await loginService.login({
-        username: email,
-        password
-      })
-
-      window.localStorage.setItem(
-        'loggedEvaAppUser',
-        JSON.stringify(userResponse)
-      )
-      setUser(userResponse)
-      setEmail('')
-      setPassword('')
-      setAuthenticated(true)
+      await login(email, password)
+      navigate('/dashboard')
     } catch (e) {
-      setAuthenticated(false)
       setErrorMessage('Credenciales no válidas')
       setTimeout(() => {
         setErrorMessage(null)

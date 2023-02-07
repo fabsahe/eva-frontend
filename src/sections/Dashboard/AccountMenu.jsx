@@ -31,7 +31,7 @@ export default function AccountMenu({ username }) {
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <Tooltip title="Ajustes de cuenta">
+        <Tooltip title="Ajustes de cuenta" placement="left">
           <Chip
             icon={<AccountCircleIcon />}
             label={username}

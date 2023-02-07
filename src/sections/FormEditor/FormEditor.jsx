@@ -116,7 +116,7 @@ export default function FormEditor({ mode }) {
       setStartDate(dayjs(data.fechaInicio).format('YYYY-MM-DD'))
       setEndDate(dayjs(data.fechaFin).format('YYYY-MM-DD'))
 
-      setForm(data.items)
+      setForm(data.preguntas)
     }
   }
 
@@ -124,7 +124,7 @@ export default function FormEditor({ mode }) {
     const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setToken(user.data.token)
+      setToken(user.token)
     }
     getCareers()
     getPeriods()
@@ -228,16 +228,7 @@ export default function FormEditor({ mode }) {
 
   const createNewForm = async (formData) => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-      const response = await axios.post(
-        'http://localhost:3001/api/forms',
-        formData,
-        config
-      )
+      const response = await formService.createNewForm(token, formData)
       if (response.data.status === 'OK') {
         noti('Cuestionario creado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
@@ -313,6 +304,14 @@ export default function FormEditor({ mode }) {
       setType('options')
       setOptions(questionSelected.opciones)
     }
+  }
+
+  const removeQuestion = (questionId) => {
+    const questionSelected = form.findIndex((item) => item._id === questionId)
+    const formStr = JSON.stringify(form)
+    const updatedForm = JSON.parse(formStr)
+    updatedForm.splice(questionSelected, 1)
+    setForm(updatedForm)
   }
 
   const updateQuestion = () => {
@@ -484,17 +483,26 @@ export default function FormEditor({ mode }) {
                   }}
                 >
                   <Grid container>
-                    <Grid item md={10}>
+                    <Grid item md={9}>
                       <Typography variant="h6" component="div" sx={{ mb: 1 }}>
                         {`${index + 1} - ${item.pregunta}`}
                       </Typography>
                     </Grid>
-                    <Grid item md={2}>
+                    <Grid item md={3}>
                       <Box
                         display="flex"
                         justifyContent="flex-end"
                         alignItems="flex-end"
                       >
+                        <Button
+                          sx={{ mr: 1 }}
+                          variant="outlined"
+                          size="small"
+                          color="error"
+                          onClick={() => removeQuestion(item._id)}
+                        >
+                          Eliminar
+                        </Button>
                         <Button
                           variant="outlined"
                           size="small"

@@ -17,13 +17,12 @@ import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
 import Snackbar from '@mui/material/Snackbar'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
-import EditIcon from '@mui/icons-material/Edit'
-import LinkIcon from '@mui/icons-material/Link'
+
 import EventIcon from '@mui/icons-material/Event'
 import axios from 'axios'
 import dayjs from 'dayjs'
 
-export default function FormsList() {
+export default function FormListStatistics() {
   const [forms, setForms] = useState([])
   const [formUrl, setFormUrl] = useState('')
   const [open, setOpen] = useState(false)
@@ -46,11 +45,6 @@ export default function FormsList() {
 
   const handleChangeUrl = (event) => {
     setFormUrl(event.target.value)
-  }
-
-  const handleClickOpen = (formId) => {
-    setFormUrl(`http://localhost:5173/cuestionarios/${formId}`)
-    setOpen(true)
   }
 
   const handleClose = () => {
@@ -82,7 +76,7 @@ export default function FormsList() {
         }}
       >
         <Typography variant="h5" sx={{ mb: 2 }}>
-          Lista de cuestionarios
+          Estadísticas de cuestionarios
         </Typography>
 
         {forms &&
@@ -130,25 +124,7 @@ export default function FormsList() {
                         }
                         fullWidth
                       >
-                        Clonar
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<EditIcon />}
-                        onClick={() =>
-                          navigate(`/dashboard/editar-cuestionario/${form._id}`)
-                        }
-                        fullWidth
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<LinkIcon />}
-                        onClick={() => handleClickOpen(form._id)}
-                        fullWidth
-                      >
-                        Enlace
+                        Respuestas
                       </Button>
                     </Stack>
                   </Grid>

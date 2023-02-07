@@ -21,6 +21,7 @@ import InfoCard from './InfoCard'
 import AccountMenu from './AccountMenu'
 import MainListItems from './MainListItems'
 import Logo from '../../assets/images/utm-header.jpg'
+import FormListStatistics from '../FormList/FormListStatistics'
 
 const drawerWidth = 240
 
@@ -74,6 +75,7 @@ const Drawer = styled(MuiDrawer, {
 function getSection(name) {
   const sections = {
     cuestionarios: <FormList />,
+    estadisticas: <FormListStatistics />,
     'nuevo-cuestionario': <FormEditor mode="create" />,
     'editar-cuestionario': <FormEditor mode="edit" />,
     'clonar-cuestionario': <FormEditor mode="clone" />,
@@ -91,8 +93,8 @@ export default function Dashboard() {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUsername(user.data.username)
+      const currentUser = JSON.parse(loggedUserJSON)
+      setUsername(currentUser.email)
     }
   }, [])
 

@@ -9,7 +9,7 @@ const evaTheme = createTheme({
       main: '#BC2423'
     },
     success: {
-      main: '#689689',
+      main: '#69a644',
       contrastText: '#fff'
     },
     hookgreen: {
