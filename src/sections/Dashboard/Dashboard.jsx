@@ -21,7 +21,8 @@ import InfoCard from './InfoCard'
 import AccountMenu from './AccountMenu'
 import MainListItems from './MainListItems'
 import Logo from '../../assets/images/utm-header.jpg'
-import FormListStatistics from '../FormList/FormListStatistics'
+import FormListStatistics from '../FormStatistics/FormListStatistics'
+import FormStatistics from '../FormStatistics/FormStatistics'
 
 const drawerWidth = 240
 
@@ -76,6 +77,7 @@ function getSection(name) {
   const sections = {
     cuestionarios: <FormList />,
     estadisticas: <FormListStatistics />,
+    'estadisticas-cuestionario': <FormStatistics />,
     'nuevo-cuestionario': <FormEditor mode="create" />,
     'editar-cuestionario': <FormEditor mode="edit" />,
     'clonar-cuestionario': <FormEditor mode="clone" />,

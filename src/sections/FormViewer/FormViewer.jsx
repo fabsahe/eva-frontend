@@ -96,7 +96,6 @@ export default function FormViewer() {
     const professorsResponse = await axios.get(
       `http://localhost:3001/api/assignments/professors/${event.target.value}`
     )
-
     setProfessors(professorsResponse.data.data)
   }
 
@@ -197,7 +196,7 @@ export default function FormViewer() {
         component="main"
         sx={{
           flexGrow: 1,
-          height: '100vh',
+          height: finished ? '80vh' : '100vh',
           overflow: 'auto'
         }}
       >
@@ -295,8 +294,8 @@ export default function FormViewer() {
                   >
                     {professors.map((professorItem) => (
                       <MenuItem
-                        key={professorItem._id}
-                        value={professorItem._id}
+                        key={professorItem.profesor._id}
+                        value={professorItem.profesor._id}
                       >
                         {`${professorItem.profesor.nombre} - ${professorItem.materia.nombre}`}
                       </MenuItem>

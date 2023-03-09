@@ -172,7 +172,7 @@ export default function FormsList() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleClose}>Cerrar</Button>
           <Button onClick={copyToClipboard}>Copiar enlace</Button>
         </DialogActions>
       </Dialog>

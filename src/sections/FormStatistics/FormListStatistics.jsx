@@ -120,7 +120,9 @@ export default function FormListStatistics() {
                         startIcon={<FileCopyIcon />}
                         sx={{ mr: 1 }}
                         onClick={() =>
-                          navigate(`/dashboard/clonar-cuestionario/${form._id}`)
+                          navigate(
+                            `/dashboard/estadisticas-cuestionario/${form._id}`
+                          )
                         }
                         fullWidth
                       >
