@@ -55,7 +55,7 @@ export default function PasswordField({
   }
 
   return (
-    <FormControl sx={{ my: 2 }} variant="outlined" fullWidth>
+    <FormControl sx={{ mt: 1.5 }} variant="outlined" fullWidth>
       <InputLabel htmlFor="password-field" error={error} required>
         {label}
       </InputLabel>

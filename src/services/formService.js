@@ -13,12 +13,26 @@ const createNewForm = async (token, formData) => {
       Authorization: `Bearer ${token}`
     }
   }
-  const response = await axios.post(
+  const { data } = await axios.post(
     'http://localhost:3001/api/forms',
     formData,
     config
   )
-  return response
+  return data
 }
 
-export default { getOneForm, createNewForm }
+const updateOneForm = async (token, formId, formData) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+  const { data } = await axios.put(
+    `http://localhost:3001/api/forms/${formId}`,
+    formData,
+    config
+  )
+  return data
+}
+
+export default { getOneForm, createNewForm, updateOneForm }

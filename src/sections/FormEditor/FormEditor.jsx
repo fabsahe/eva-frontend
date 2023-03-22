@@ -31,6 +31,7 @@ import { useSnackbar } from 'notistack'
 import dayjs from 'dayjs'
 import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
 import formService from '../../services/formService'
+import answerService from '../../services/answerService'
 
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -70,6 +71,7 @@ export default function FormEditor({ mode }) {
   const [endDate, setEndDate] = useState(today)
   const [questionMode, setQuestionMode] = useState('new')
   const [questionToEdit, setQuestionToEdit] = useState(null)
+  const [emptyForm, setEmptyForm] = useState(true)
 
   const { enqueueSnackbar: noti } = useSnackbar()
   const navigate = useNavigate()
@@ -117,6 +119,10 @@ export default function FormEditor({ mode }) {
       setEndDate(dayjs(data.fechaFin).format('YYYY-MM-DD'))
 
       setForm(data.preguntas)
+
+      // obtener respuestas
+      const answersResponse = await answerService.getAnswers(formId)
+      setEmptyForm(answersResponse.data.length === 0)
     }
   }
 
@@ -229,7 +235,7 @@ export default function FormEditor({ mode }) {
   const createNewForm = async (formData) => {
     try {
       const response = await formService.createNewForm(token, formData)
-      if (response.data.status === 'OK') {
+      if (response.status === 'OK') {
         noti('Cuestionario creado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
       }
@@ -240,17 +246,8 @@ export default function FormEditor({ mode }) {
 
   const updateOneForm = async (formData) => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-      const response = await axios.put(
-        `http://localhost:3001/api/forms/${formId}`,
-        formData,
-        config
-      )
-      if (response.data.status === 'OK') {
+      const response = await formService.updateOneForm(token, formId, formData)
+      if (response.status === 'OK') {
         noti('Cuestionario actualizado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
       }
@@ -289,6 +286,7 @@ export default function FormEditor({ mode }) {
     if (mode === 'create' || mode === 'clone') {
       createNewForm(newForm)
     } else if (mode === 'edit') {
+      newForm.isEmpty = emptyForm
       updateOneForm(newForm)
     }
   }
@@ -360,7 +358,7 @@ export default function FormEditor({ mode }) {
                 onChange={handleChangeTitle}
               />
 
-              <FormControl fullWidth sx={{ mb: 2 }}>
+              <FormControl fullWidth sx={{ mb: 2 }} disabled={!emptyForm}>
                 <InputLabel id="demo-multiple-chip-label">Carreras</InputLabel>
                 <Select
                   labelId="demo-multiple-chip-label"
@@ -391,7 +389,7 @@ export default function FormEditor({ mode }) {
 
               <Grid container spacing={2}>
                 <Grid item md={6} lg={6}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth disabled={!emptyForm}>
                     <InputLabel id="year-select-label">Año</InputLabel>
                     <Select
                       labelId="year-select-label"
@@ -411,7 +409,7 @@ export default function FormEditor({ mode }) {
                   </FormControl>
                 </Grid>
                 <Grid item md={6} lg={6}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth disabled={!emptyForm}>
                     <InputLabel id="period-select-label">Periodo</InputLabel>
                     <Select
                       labelId="period-select-label"
@@ -489,29 +487,31 @@ export default function FormEditor({ mode }) {
                       </Typography>
                     </Grid>
                     <Grid item md={3}>
-                      <Box
-                        display="flex"
-                        justifyContent="flex-end"
-                        alignItems="flex-end"
-                      >
-                        <Button
-                          sx={{ mr: 1 }}
-                          variant="outlined"
-                          size="small"
-                          color="error"
-                          onClick={() => removeQuestion(item._id)}
+                      {emptyForm ? (
+                        <Box
+                          display="flex"
+                          justifyContent="flex-end"
+                          alignItems="flex-end"
                         >
-                          Eliminar
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color="success"
-                          onClick={() => editQuestion(item._id)}
-                        >
-                          Editar
-                        </Button>
-                      </Box>
+                          <Button
+                            sx={{ mr: 0.5 }}
+                            variant="outlined"
+                            size="small"
+                            color="success"
+                            onClick={() => editQuestion(item._id)}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="error"
+                            onClick={() => removeQuestion(item._id)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Box>
+                      ) : null}
                     </Grid>
                   </Grid>
 
@@ -547,95 +547,97 @@ export default function FormEditor({ mode }) {
             ))}
 
           <Grid item xs={12} md={8} lg={8}>
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
-                {questionModeText}
-              </Typography>
-
-              <TextField
-                fullWidth
-                hiddenLabel
-                variant="outlined"
-                placeholder="Texto de la pregunta"
-                sx={{ mb: 1 }}
-                onChange={handleChangeQuestion}
-                value={question}
-              />
-
-              <FormControl>
-                <FormLabel id="demo-row-radio-buttons-group-label">
-                  Tipo
-                </FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby="demo-row-radio-buttons-group-label"
-                  name="row-radio-buttons-group"
-                  value={type}
-                  onChange={handleChangeType}
-                >
-                  <FormControlLabel
-                    value="open"
-                    control={<Radio />}
-                    label="Pregunta abierta"
-                  />
-                  <FormControlLabel
-                    value="options"
-                    control={<Radio />}
-                    label="Opciones"
-                  />
-                </RadioGroup>
-              </FormControl>
-
-              {type === 'options' && (
-                <Typography component="h1" variant="subtitle2">
-                  Opciones
-                </Typography>
-              )}
-              <Stack sx={{ width: '100%' }}>
-                {options &&
-                  options.map((option) => (
-                    <TextField
-                      key={option._id}
-                      hiddenLabel
-                      variant="outlined"
-                      placeholder="Texto de la opción"
-                      sx={{ mb: 1 }}
-                      value={option.texto}
-                      onChange={(event) =>
-                        handleChangeOptions(event, option._id)
-                      }
-                      onKeyPress={(e) =>
-                        e.key === 'Enter' && e.preventDefault()
-                      }
-                    />
-                  ))}
-              </Stack>
-
-              {type === 'options' && (
-                <Button
-                  variant="outlined"
-                  startIcon={<AddCircleOutlineIcon />}
-                  onClick={addOption}
-                  sx={{ mt: 1, mb: 1 }}
-                >
-                  Agregar opción
-                </Button>
-              )}
-
-              <Button
-                variant="contained"
-                startIcon={<AddCircleOutlineIcon />}
-                onClick={handleQuestion}
+            {emptyForm ? (
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
               >
-                {questionModeText}
-              </Button>
-            </Paper>
+                <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
+                  {questionModeText}
+                </Typography>
+
+                <TextField
+                  fullWidth
+                  hiddenLabel
+                  variant="outlined"
+                  placeholder="Texto de la pregunta"
+                  sx={{ mb: 1 }}
+                  onChange={handleChangeQuestion}
+                  value={question}
+                />
+
+                <FormControl>
+                  <FormLabel id="demo-row-radio-buttons-group-label">
+                    Tipo
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                    value={type}
+                    onChange={handleChangeType}
+                  >
+                    <FormControlLabel
+                      value="open"
+                      control={<Radio />}
+                      label="Pregunta abierta"
+                    />
+                    <FormControlLabel
+                      value="options"
+                      control={<Radio />}
+                      label="Opciones"
+                    />
+                  </RadioGroup>
+                </FormControl>
+
+                {type === 'options' && (
+                  <Typography component="h1" variant="subtitle2">
+                    Opciones
+                  </Typography>
+                )}
+                <Stack sx={{ width: '100%' }}>
+                  {options &&
+                    options.map((option) => (
+                      <TextField
+                        key={option._id}
+                        hiddenLabel
+                        variant="outlined"
+                        placeholder="Texto de la opción"
+                        sx={{ mb: 1 }}
+                        value={option.texto}
+                        onChange={(event) =>
+                          handleChangeOptions(event, option._id)
+                        }
+                        onKeyPress={(e) =>
+                          e.key === 'Enter' && e.preventDefault()
+                        }
+                      />
+                    ))}
+                </Stack>
+
+                {type === 'options' && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<AddCircleOutlineIcon />}
+                    onClick={addOption}
+                    sx={{ mt: 1, mb: 1 }}
+                  >
+                    Agregar opción
+                  </Button>
+                )}
+
+                <Button
+                  variant="contained"
+                  startIcon={<AddCircleOutlineIcon />}
+                  onClick={handleQuestion}
+                >
+                  {questionModeText}
+                </Button>
+              </Paper>
+            ) : null}
           </Grid>
         </Grid>
 

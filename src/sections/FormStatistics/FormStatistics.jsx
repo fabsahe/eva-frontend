@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-restricted-syntax */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
@@ -38,7 +37,6 @@ export default function FormStatistics() {
   const params = useParams()
   const formId = params.id
 
-  // eslint-disable-next-line no-unused-vars
   function removeDuplicates(arr) {
     return arr.filter((item, index) => arr.indexOf(item) === index)
   }
@@ -90,7 +88,18 @@ export default function FormStatistics() {
     getGroups(answerSet)
   }
 
-  const getAnswers = () => {
+  const getForm = async () => {
+    const response = await formService.getOneForm(formId)
+    if (response.status === 'OK') {
+      const { data } = response
+      setForm(data.preguntas)
+      setTitle(data.titulo)
+      setQuestions(data.preguntas)
+      getFilters()
+    }
+  }
+
+  /* const getAnswers = () => {
     // console.log('filter = ', filterType, filter)
     // console.log({ allAnswers })
     const filterProp = filterLabel[filterType].toLowerCase()
@@ -119,19 +128,29 @@ export default function FormStatistics() {
     }
     // console.log({ groupedAnswers })
     setAnswers(groupedAnswers)
-  }
-
-  const getForm = async () => {
-    const response = await formService.getOneForm(formId)
-    if (response.status === 'OK') {
-      const { data } = response
-      // console.log('form = ', data.preguntas)
-      setForm(data.preguntas)
-      setTitle(data.titulo)
-      setQuestions(data.preguntas)
-
-      getFilters()
-    }
+  } */
+  const getAnswers = () => {
+    const filterProp = filterLabel[filterType].toLowerCase()
+    const filterAnswers = allAnswers.filter(
+      (item) => item[filterProp] === filter
+    )
+    const emptyAnswers = questions.map((item) => ({
+      key: item._id,
+      value: []
+    }))
+    const groupedAnswers = emptyAnswers.reduce(
+      (obj, item) => Object.assign(obj, { [item.key]: item.value }),
+      {}
+    )
+    filterAnswers.forEach((answerList) => {
+      answerList.respuestas.forEach((answer) => {
+        groupedAnswers[answer.pregunta].push({
+          id: answer._id,
+          texto: answer.respuesta
+        })
+      })
+    })
+    setAnswers(groupedAnswers)
   }
 
   const handleChangeFilterType = (event) => {
