@@ -8,10 +8,25 @@ import randomColor from 'randomcolor'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
+const plugin = {
+  id: 'customCanvasBackgroundColor',
+  beforeDraw: (chart, args, options) => {
+    const { ctx } = chart
+    ctx.save()
+    ctx.globalCompositeOperation = 'destination-over'
+    ctx.fillStyle = options.color || '#99ffff'
+    ctx.fillRect(0, 0, chart.width, chart.height)
+    ctx.restore()
+  }
+}
+
 const options = {
   plugins: {
     legend: {
       position: 'top'
+    },
+    customCanvasBackgroundColor: {
+      color: 'white'
     }
   }
 }
@@ -46,7 +61,7 @@ export default function PieChart({ raw }) {
       <Grid item xs={12} md={3} lg={3} />
       <Grid item xs={12} md={6} lg={6}>
         <Box sx={{ pt: 0, px: 2, mb: 1 }}>
-          <Pie data={data} options={options} />
+          <Pie data={data} options={options} plugins={[plugin]} />
         </Box>
       </Grid>
     </Grid>

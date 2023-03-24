@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -10,15 +9,24 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import axios from 'axios'
+import { jsPDF } from 'jspdf'
 import formService from '../../services/formService'
 import answerService from '../../services/answerService'
 import PieChart from './PieChart'
+import PDFStatistics from './PDFStatistics'
 
 const filterLabel = {
   career: 'Carrera',
   professor: 'Profesor',
   group: 'Grupo'
+}
+
+const filterPDF = {
+  career: 'la carrera',
+  professor: 'el profesor',
+  group: 'el grupo'
 }
 
 export default function FormStatistics() {
@@ -33,9 +41,11 @@ export default function FormStatistics() {
   const [careerList, setCareerList] = useState([])
   const [professorList, setProfessorList] = useState([])
   const [groupList, setGroupList] = useState([])
+  const [infoPDF, setInfoPDF] = useState(null)
 
   const params = useParams()
   const formId = params.id
+  const certificateTemplateRef = useRef(null)
 
   function removeDuplicates(arr) {
     return arr.filter((item, index) => arr.indexOf(item) === index)
@@ -100,8 +110,6 @@ export default function FormStatistics() {
   }
 
   /* const getAnswers = () => {
-    // console.log('filter = ', filterType, filter)
-    // console.log({ allAnswers })
     const filterProp = filterLabel[filterType].toLowerCase()
 
     const filterAnswers = allAnswers.filter(
@@ -126,7 +134,6 @@ export default function FormStatistics() {
         })
       }
     }
-    // console.log({ groupedAnswers })
     setAnswers(groupedAnswers)
   } */
   const getAnswers = () => {
@@ -161,6 +168,11 @@ export default function FormStatistics() {
     setFilter(event.target.value)
   }
 
+  const getFilterName = () => {
+    const found = filterList.find((item) => item._id === filter)
+    return found.nombre
+  }
+
   useEffect(() => {
     getForm()
   }, [])
@@ -180,11 +192,36 @@ export default function FormStatistics() {
   useEffect(() => {
     if (filter) {
       getAnswers()
+      setInfoPDF({
+        title,
+        filterType: filterPDF[filterType],
+        filterName: getFilterName()
+      })
     }
   }, [filter])
 
+  const handleGeneratePdf = () => {
+    // eslint-disable-next-line new-cap
+    const doc = new jsPDF({
+      format: 'letter',
+      unit: 'px'
+    })
+
+    doc.html(certificateTemplateRef.current, {
+      async callback(doc2) {
+        doc2.save('resultados_cuestionario')
+      }
+    })
+  }
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <div ref={certificateTemplateRef}>
+        {infoPDF ? (
+          <PDFStatistics info={infoPDF} form={form} answers={answers} />
+        ) : null}
+      </div>
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={8} lg={8}>
           <Paper
@@ -288,6 +325,10 @@ export default function FormStatistics() {
           </Paper>
         </Grid>
       </Grid>
+
+      <Button variant="contained" color="success" onClick={handleGeneratePdf}>
+        Descargar
+      </Button>
     </Container>
   )
 }
