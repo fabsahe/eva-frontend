@@ -77,6 +77,12 @@ export default function FormViewer() {
     }
   }
 
+  const getNumberByTokens = (tokens) => {
+    const a = parseInt(tokens[0], 10) * 10
+    const b = tokens[1].charCodeAt(0) - 97
+    return a + b
+  }
+
   const handleChangeCareer = async (event) => {
     const careerId = event.target.value
     setCareer(careerId)
@@ -90,15 +96,39 @@ export default function FormViewer() {
     const currentGroups = allGroups.filter(
       (item, index) => allGroups.indexOf(item) === index
     )
-    // ordenadr grupos
+
+    // ordenar grupos
+
+    /*
     currentGroups.sort((a, b) => {
       let aNum = parseInt(a.match(/\d+/)[0], 10)
       let bNum = parseInt(b.match(/\d+/)[0], 10)
       if (Number.isNaN(aNum)) aNum = 0
       if (Number.isNaN(bNum)) bNum = 0
       return aNum - bNum
+    }) */
+    // Sub-arreglo de los que tienen la forma 'NUMERO-LETRA'
+    const subArray1 = currentGroups.filter((item) =>
+      /^\d+-[A-Za-z]$/.test(item)
+    )
+
+    // Sub-arreglo de los que empiezan con 'P'
+    const subArray2 = currentGroups.filter((item) => item.startsWith('P'))
+
+    // Sub-arreglo de los que empiezan con 'M' o 'D'
+    const subArray3 = currentGroups.filter(
+      (item) => item.startsWith('M') || item.startsWith('D')
+    )
+
+    subArray1.sort((a, b) => {
+      const aTokens = a.split('-')
+      const bTokens = b.split('-')
+      const aNum = getNumberByTokens(aTokens)
+      const bNum = getNumberByTokens(bTokens)
+      return aNum - bNum
     })
-    setGroups(currentGroups)
+    const sortedGroups = [...subArray1, ...subArray2, ...subArray3]
+    setGroups(sortedGroups)
   }
 
   const handleChangeGroup = async (event) => {
@@ -108,6 +138,7 @@ export default function FormViewer() {
       `http://localhost:3001/api/assignments/professors/${groupName}?year=${year}&period=${period}`
     )
     console.log(professorsResponse.data.data)
+    // console.log(professors)
     setProfessors(professorsResponse.data.data)
   }
 
@@ -304,14 +335,15 @@ export default function FormViewer() {
                     onChange={handleChangeProfessor}
                     required
                   >
-                    {professors.map((professorItem) => (
-                      <MenuItem
-                        key={professorItem.profesor._id}
-                        value={professorItem.profesor._id}
-                      >
-                        {`${professorItem.profesor.nombre} - ${professorItem.materia.nombre}`}
-                      </MenuItem>
-                    ))}
+                    {professors &&
+                      professors.map((professorItem) => (
+                        <MenuItem
+                          key={professorItem.profesor._id}
+                          value={professorItem.profesor._id}
+                        >
+                          {`${professorItem.profesor.nombre} - ${professorItem.materia.nombre}`}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
                 <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>

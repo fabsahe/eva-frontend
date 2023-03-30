@@ -34,6 +34,7 @@ export default function FormListStatistics() {
     try {
       const response = await axios.get('http://localhost:3001/api/forms')
       const { data } = response.data
+      console.log(data)
       setForms(data)
     } catch (err) {
       console.log(err)
