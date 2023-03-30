@@ -78,24 +78,36 @@ export default function FormViewer() {
   }
 
   const handleChangeCareer = async (event) => {
-    setCareer(event.target.value)
+    const careerId = event.target.value
+    setCareer(careerId)
     const assignments = await axios.get(
-      `http://localhost:3001/api/assignments/${event.target.value}`
+      `http://localhost:3001/api/assignments/${careerId}?year=${year}&period=${period}`
     )
     const allGroups = assignments.data.data.map(
       (assignment) => assignment.grupo
     )
+    // eliminar repetidos
     const currentGroups = allGroups.filter(
       (item, index) => allGroups.indexOf(item) === index
     )
+    // ordenadr grupos
+    currentGroups.sort((a, b) => {
+      let aNum = parseInt(a.match(/\d+/)[0], 10)
+      let bNum = parseInt(b.match(/\d+/)[0], 10)
+      if (Number.isNaN(aNum)) aNum = 0
+      if (Number.isNaN(bNum)) bNum = 0
+      return aNum - bNum
+    })
     setGroups(currentGroups)
   }
 
   const handleChangeGroup = async (event) => {
-    setGroup(event.target.value)
+    const groupName = event.target.value
+    setGroup(groupName)
     const professorsResponse = await axios.get(
-      `http://localhost:3001/api/assignments/professors/${event.target.value}`
+      `http://localhost:3001/api/assignments/professors/${groupName}?year=${year}&period=${period}`
     )
+    console.log(professorsResponse.data.data)
     setProfessors(professorsResponse.data.data)
   }
 

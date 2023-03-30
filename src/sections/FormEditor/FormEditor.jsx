@@ -87,10 +87,24 @@ export default function FormEditor({ mode }) {
   const questionModeText =
     questionMode === 'new' ? 'Agregar pregunta' : 'Actualizar pregunta'
 
+  const sortCareers = (allCareers) => {
+    allCareers.sort((a, b) => {
+      if (a.codigo.length >= 3 && b.codigo.length < 3) {
+        return 1 // a va después de b
+      }
+      if (a.codigo.length < 3 && b.codigo.length >= 3) {
+        return -1 // a va antes de b
+      }
+      return a.codigo.localeCompare(b.codigo) // ordenar por codigo
+    })
+    return allCareers
+  }
+
   const getCareers = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/careers')
-      setCareerList(response.data.data)
+      const sortedCareers = sortCareers(response.data.data)
+      setCareerList(sortedCareers)
     } catch (err) {
       console.log(err)
     }
@@ -282,7 +296,6 @@ export default function FormEditor({ mode }) {
         typeof endDate === 'string' ? endDate : endDate.format('YYYY-MM-DD')
     }
 
-    // console.log(newForm)
     if (mode === 'create' || mode === 'clone') {
       createNewForm(newForm)
     } else if (mode === 'edit') {

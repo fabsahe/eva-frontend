@@ -42,6 +42,7 @@ export default function FormStatistics() {
   const [professorList, setProfessorList] = useState([])
   const [groupList, setGroupList] = useState([])
   const [infoPDF, setInfoPDF] = useState(null)
+  const [preview, setPreview] = useState(false)
 
   const params = useParams()
   const formId = params.id
@@ -201,6 +202,7 @@ export default function FormStatistics() {
   }, [filter])
 
   const handleGeneratePdf = () => {
+    setPreview(true)
     // eslint-disable-next-line new-cap
     const doc = new jsPDF({
       format: 'letter',
@@ -210,6 +212,7 @@ export default function FormStatistics() {
     doc.html(certificateTemplateRef.current, {
       async callback(doc2) {
         doc2.save('resultados_cuestionario')
+        setPreview(false)
       }
     })
   }
@@ -218,7 +221,9 @@ export default function FormStatistics() {
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <div ref={certificateTemplateRef}>
         {infoPDF ? (
-          <PDFStatistics info={infoPDF} form={form} answers={answers} />
+          <div style={{ visibility: preview ? 'visible' : 'hidden' }}>
+            <PDFStatistics info={infoPDF} form={form} answers={answers} />
+          </div>
         ) : null}
       </div>
 

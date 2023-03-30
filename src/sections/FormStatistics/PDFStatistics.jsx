@@ -6,7 +6,7 @@ import PieChart from './PieChart'
 
 const styles = {
   container: {
-    zIndex: '-100',
+    zIndex: '-1000',
     display: 'flex',
     flexDirection: 'column',
     position: 'absolute',
@@ -25,8 +25,6 @@ const styles = {
 }
 
 export default function PDFStatistics({ info, form, answers }) {
-  console.log(info)
-
   return (
     <div style={styles.container}>
       <Typography
