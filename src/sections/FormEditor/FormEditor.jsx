@@ -136,7 +136,9 @@ export default function FormEditor({ mode }) {
 
       // obtener respuestas
       const answersResponse = await answerService.getAnswers(formId)
-      setEmptyForm(answersResponse.data.length === 0)
+      if (mode === 'edit') {
+        setEmptyForm(answersResponse.data.length === 0)
+      }
     }
   }
 
@@ -270,10 +272,15 @@ export default function FormEditor({ mode }) {
     }
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     if (form.length === 0) {
       noti('El cuestionario está vacío', NOTI_ERROR)
+      return
+    }
+    const existsTitle = await formService.findForm(title.trim())
+    if (existsTitle) {
+      noti('El título ya existe', NOTI_ERROR)
       return
     }
 
@@ -283,7 +290,7 @@ export default function FormEditor({ mode }) {
     }))
 
     const newForm = {
-      titulo: title,
+      titulo: title.trim(),
       año: year,
       periodo: period,
       carreras: careers,

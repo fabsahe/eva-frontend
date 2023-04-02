@@ -7,6 +7,11 @@ const getOneForm = async (formId) => {
   return data
 }
 
+const findForm = async (title) => {
+  const { data } = await axios.post(`${baseUrl}/find`, { title })
+  return data.data
+}
+
 const createNewForm = async (token, formData) => {
   const config = {
     headers: {
@@ -35,4 +40,4 @@ const updateOneForm = async (token, formId, formData) => {
   return data
 }
 
-export default { getOneForm, createNewForm, updateOneForm }
+export default { getOneForm, findForm, createNewForm, updateOneForm }
