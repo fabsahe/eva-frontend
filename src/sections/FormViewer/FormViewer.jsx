@@ -137,8 +137,6 @@ export default function FormViewer() {
     const professorsResponse = await axios.get(
       `http://localhost:3001/api/assignments/professors/${groupName}?year=${year}&period=${period}`
     )
-    console.log(professorsResponse.data.data)
-    // console.log(professors)
     setProfessors(professorsResponse.data.data)
   }
 

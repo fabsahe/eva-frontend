@@ -15,6 +15,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
+import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
 
@@ -34,7 +35,6 @@ export default function FormListStatistics() {
     try {
       const response = await axios.get('http://localhost:3001/api/forms')
       const { data } = response.data
-      console.log(data)
       setForms(data)
     } catch (err) {
       console.log(err)
@@ -89,7 +89,7 @@ export default function FormListStatistics() {
             >
               <CardContent>
                 <Grid container>
-                  <Grid item md={10} lg={10}>
+                  <Grid item md={9} lg={9}>
                     <Typography variant="h5" component="div" sx={{ mb: 0.5 }}>
                       {form.titulo}
                     </Typography>
@@ -114,21 +114,27 @@ export default function FormListStatistics() {
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item md={2} lg={2}>
+                  <Grid item md={3} lg={3}>
                     <Stack spacing={1} sx={{ ml: 1, mr: 2 }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<FileCopyIcon />}
-                        sx={{ mr: 1 }}
-                        onClick={() =>
-                          navigate(
-                            `/dashboard/estadisticas-cuestionario/${form._id}`
-                          )
-                        }
-                        fullWidth
-                      >
-                        Respuestas
-                      </Button>
+                      {form.numeroRespuestas > 0 ? (
+                        <Button
+                          variant="outlined"
+                          startIcon={<FileCopyIcon />}
+                          sx={{ mr: 1 }}
+                          onClick={() =>
+                            navigate(
+                              `/dashboard/estadisticas-cuestionario/${form._id}`
+                            )
+                          }
+                          fullWidth
+                        >
+                          Respuestas
+                        </Button>
+                      ) : (
+                        <Alert severity="info">
+                          El cuestionario no tiene respuestas
+                        </Alert>
+                      )}
                     </Stack>
                   </Grid>
                 </Grid>
