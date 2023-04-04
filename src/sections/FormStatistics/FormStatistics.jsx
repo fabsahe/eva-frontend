@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -11,22 +11,20 @@ import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import axios from 'axios'
-import { jsPDF } from 'jspdf'
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
 import formService from '../../services/formService'
 import answerService from '../../services/answerService'
 import PieChart from './PieChart'
-import PDFStatistics from './PDFStatistics'
+import { useImageData, useChartActions } from '../../store/chartStore'
+import createDocument from '../../utils/createDocument'
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const filterLabel = {
   career: 'Carrera',
   professor: 'Profesor',
   group: 'Grupo'
-}
-
-const filterPDF = {
-  career: 'la carrera',
-  professor: 'el profesor',
-  group: 'el grupo'
 }
 
 export default function FormStatistics() {
@@ -41,12 +39,12 @@ export default function FormStatistics() {
   const [careerList, setCareerList] = useState([])
   const [professorList, setProfessorList] = useState([])
   const [groupList, setGroupList] = useState([])
-  const [infoPDF, setInfoPDF] = useState(null)
-  const [preview, setPreview] = useState(false)
+
+  const imageData = useImageData()
+  const { startDownload, finishDownload } = useChartActions()
 
   const params = useParams()
   const formId = params.id
-  const certificateTemplateRef = useRef(null)
 
   function removeDuplicates(arr) {
     return arr.filter((item, index) => arr.indexOf(item) === index)
@@ -110,33 +108,6 @@ export default function FormStatistics() {
     }
   }
 
-  /* const getAnswers = () => {
-    const filterProp = filterLabel[filterType].toLowerCase()
-
-    const filterAnswers = allAnswers.filter(
-      (item) => item[filterProp] === filter
-    )
-
-    const emptyAnswers = questions.map((item) => ({
-      key: item._id,
-      value: []
-    }))
-
-    const groupedAnswers = emptyAnswers.reduce(
-      (obj, item) => Object.assign(obj, { [item.key]: item.value }),
-      {}
-    )
-
-    for (const answerList of filterAnswers) {
-      for (const answer of answerList.respuestas) {
-        groupedAnswers[answer.pregunta].push({
-          id: answer._id,
-          texto: answer.respuesta
-        })
-      }
-    }
-    setAnswers(groupedAnswers)
-  } */
   const getAnswers = () => {
     const filterProp = filterLabel[filterType].toLowerCase()
     const filterAnswers = allAnswers.filter(
@@ -169,11 +140,6 @@ export default function FormStatistics() {
     setFilter(event.target.value)
   }
 
-  const getFilterName = () => {
-    const found = filterList.find((item) => item._id === filter)
-    return found.nombre
-  }
-
   useEffect(() => {
     getForm()
   }, [])
@@ -193,40 +159,41 @@ export default function FormStatistics() {
   useEffect(() => {
     if (filter) {
       getAnswers()
-      setInfoPDF({
-        title,
-        filterType: filterPDF[filterType],
-        filterName: getFilterName()
-      })
     }
   }, [filter])
 
   const handleGeneratePdf = () => {
-    setPreview(true)
-    // eslint-disable-next-line new-cap
-    const doc = new jsPDF({
-      format: 'letter',
-      unit: 'px'
-    })
-
-    doc.html(certificateTemplateRef.current, {
-      async callback(doc2) {
-        doc2.save('resultados_cuestionario')
-        setPreview(false)
-      }
-    })
+    startDownload()
   }
+
+  useEffect(() => {
+    if (imageData.length > 0) {
+      const invalidCharsRegex = /[^\w\s]/gi // expresión regular que busca todos los caracteres no válidos
+      const fileName = title
+        .toLowerCase()
+        .replace(invalidCharsRegex, '_')
+        .replace(/\s+/g, '_')
+
+      const infoPDF = {
+        title,
+        filterType,
+        filterList,
+        filter
+      }
+      const docDefinition = createDocument(
+        infoPDF,
+        questions,
+        answers,
+        imageData
+      )
+
+      pdfMake.createPdf(docDefinition).download(`${fileName}.pdf`)
+      finishDownload()
+    }
+  }, [imageData])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <div ref={certificateTemplateRef}>
-        {infoPDF ? (
-          <div style={{ visibility: preview ? 'visible' : 'hidden' }}>
-            <PDFStatistics info={infoPDF} form={form} answers={answers} />
-          </div>
-        ) : null}
-      </div>
-
       <Grid container spacing={3}>
         <Grid item xs={12} md={8} lg={8}>
           <Paper
@@ -265,7 +232,10 @@ export default function FormStatistics() {
                 </Typography>
 
                 {itemQ.opciones.length !== 0 ? (
-                  <PieChart raw={answers ? answers[itemQ._id] : []} />
+                  <PieChart
+                    raw={answers ? answers[itemQ._id] : []}
+                    index={index}
+                  />
                 ) : (
                   <ul>
                     {answers &&

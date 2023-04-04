@@ -21,6 +21,7 @@
     "dayjs": "1.11.7",
     "jspdf": "2.5.1",
     "notistack": "2.0.8",
+    "pdfmake": "0.2.7",
     "prop-types": "15.8.1",
     "randomcolor": "0.6.2",
     "react": "18.2.0",
@@ -29,7 +30,8 @@
     "react-redux": "8.0.5",
     "react-router-dom": "6.4.3",
     "redux": "4.2.0",
-    "validator": "13.7.0"
+    "validator": "13.7.0",
+    "zustand": "4.3.7"
   },
   "devDependencies": {
     "@types/react": "18.0.17",
