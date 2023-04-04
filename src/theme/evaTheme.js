@@ -16,6 +16,12 @@ const evaTheme = createTheme({
       main: '#3b6a60',
       contrastText: '#fff'
     },
+    applegreen: {
+      main: '#8EA604'
+    },
+    glaucous: {
+      main: '#777da7'
+    },
     info: {
       main: '#3c91e6'
     },
