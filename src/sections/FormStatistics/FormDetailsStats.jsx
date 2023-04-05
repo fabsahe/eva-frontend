@@ -6,13 +6,14 @@ import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import LinkIcon from '@mui/icons-material/Link'
+// import LinkIcon from '@mui/icons-material/Link'
+import RateReviewIcon from '@mui/icons-material/RateReview'
 import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
 import Chip from '@mui/material/Chip'
 import Snackbar from '@mui/material/Snackbar'
 import dayjs from 'dayjs'
-import { useModalDetails, useFormActions } from '../../store/formStore'
+import { useModalDetails, useFormActions } from '../../store/formStatsStore'
 
 const styles = {
   header1: {
@@ -31,28 +32,28 @@ const styles = {
   }
 }
 
-export default function FormDetails({ form }) {
+export default function FormDetailsStats({ form }) {
   const [open, setOpen] = useState(false)
   const [urlCopied, setUrlCopied] = useState(false)
 
   const modalDetails = useModalDetails()
   const { hideModalDetails } = useFormActions()
 
-  const formURL = `http://localhost:5173/cuestionarios/${form._id}`
+  // const formURL = `http://localhost:5173/cuestionarios/${form._id}`
 
   const handleClose = () => {
     hideModalDetails()
     setOpen(false)
   }
 
-  const copyToClipboard = async () => {
+  /* const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(formURL)
       setUrlCopied(true)
     } catch (err) {
       console.log('NO COPIADO :(')
     }
-  }
+  } */
 
   const handleCloseSnackbar = () => {
     setUrlCopied(false)
@@ -66,7 +67,7 @@ export default function FormDetails({ form }) {
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose} maxWidth="md">
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Detalles del cuestionario</DialogTitle>
         <DialogContent>
           <Typography variant="h6" component="div" sx={styles.header1}>
@@ -113,6 +114,15 @@ export default function FormDetails({ form }) {
           ))}
 
           <Typography variant="h6" component="div" sx={styles.header3}>
+            Contador de respuestas
+          </Typography>
+          <Alert
+            severity="success"
+            icon={<RateReviewIcon fontSize="inherit" />}
+          >
+            <Box sx={{ fontSize: 14, pr: 3 }}>{form.numeroRespuestas}</Box>
+          </Alert>
+          {/* <Typography variant="h6" component="div" sx={styles.header3}>
             Enlace
           </Typography>
           <Alert
@@ -125,7 +135,7 @@ export default function FormDetails({ form }) {
             }
           >
             <Box sx={{ fontSize: 14, pr: 3 }}>{formURL}</Box>
-          </Alert>
+          </Alert> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cerrar</Button>

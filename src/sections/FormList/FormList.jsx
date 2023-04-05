@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, esES } from '@mui/x-data-grid'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 import axios from 'axios'
 import Loader from '../../common/Loader'
 import ActionButtons from './ActionButtons'
-import { useFormSelected, useFormActions } from '../../store/formStore'
 import FormDetails from './FormDetails'
+import { useFormSelected, useFormActions } from '../../store/formStore'
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 80 },
@@ -87,6 +87,7 @@ export default function FormList() {
         ) : (
           <div style={{ height: 400, width: '100%' }}>
             <DataGrid
+              localeText={esES.components.MuiDataGrid.defaultProps.localeText}
               rows={rows}
               columns={columns}
               columnVisibilityModel={{
