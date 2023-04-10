@@ -43,7 +43,7 @@ const MenuProps = {
     }
   }
 }
-const today = dayjs().format('YYYY-MM-DD')
+const today = dayjs()
 const titleList = {
   create: 'Nuevo cuestionario',
   clone: 'Nuevo cuestionario (clon)',
@@ -473,7 +473,6 @@ export default function FormEditor({ mode }) {
                   onChange={(newValue) => {
                     setStartDate(newValue)
                   }}
-                  renderInput={(inputParams) => <TextField {...inputParams} />}
                   disablePast
                 />
                 <Box sx={{ my: 1 }} />
@@ -483,7 +482,6 @@ export default function FormEditor({ mode }) {
                   onChange={(newValue) => {
                     setEndDate(newValue)
                   }}
-                  renderInput={(inputParams) => <TextField {...inputParams} />}
                   disablePast
                 />
               </LocalizationProvider>
