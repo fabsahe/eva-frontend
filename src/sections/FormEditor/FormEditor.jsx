@@ -16,6 +16,7 @@ import Identification from './Identification'
 import Configuration from './Configuration'
 import QuestionItem from './QuestionItem'
 import QuestionEditor from './QuestionEditor'
+import Loader from '../../common/Loader'
 import {
   useEmptyForm,
   useTitle,
@@ -37,6 +38,7 @@ const modeSubmitButtons = {
 export default function FormEditor({ mode }) {
   const [careerList, setCareerList] = useState([])
   const [periodList, setPeriodList] = useState([])
+  const [loading, setLoading] = useState(true)
   const [token, setToken] = useState('')
 
   const emptyForm = useEmptyForm()
@@ -192,77 +194,71 @@ export default function FormEditor({ mode }) {
   }
 
   useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      await getCareers()
+      await getPeriods()
+      if (mode === 'clone' || mode === 'edit') {
+        await getForm()
+      }
+      setLoading(false)
+    }
     const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setToken(user.token)
     }
-    getCareers()
-    getPeriods()
-
-    if (mode === 'clone' || mode === 'edit') {
-      getForm()
-    }
+    fetchData()
   }, [])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box component="form" onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={8} lg={8}>
-            <Identification
-              mode={mode}
-              careerList={careerList}
-              periodList={periodList}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4} lg={4}>
-            <Configuration mode={mode} />
-          </Grid>
-
-          {questions &&
-            questions.map((question, index) => (
-              <Grid item key={question._id} xs={12} md={8} lg={8}>
-                <QuestionItem question={question} index={index} />
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <Box component="form" onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={8} lg={8}>
+                <Identification
+                  mode={mode}
+                  careerList={careerList}
+                  periodList={periodList}
+                />
               </Grid>
-            ))}
 
-          <Grid item xs={12} md={8} lg={8}>
-            <QuestionEditor />
-          </Grid>
-        </Grid>
+              <Grid item xs={12} md={4} lg={4}>
+                <Configuration mode={mode} />
+              </Grid>
 
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="hookgreen"
-          sx={{ mt: 3, mb: 2 }}
-        >
-          {submitButtonText}
-        </Button>
-      </Box>
+              {questions &&
+                questions.map((question, index) => (
+                  <Grid item key={question._id} xs={12} md={8} lg={8}>
+                    <QuestionItem question={question} index={index} />
+                  </Grid>
+                ))}
 
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          spacing: 1
-        }}
-      >
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          noValidate
-          sx={{ mt: 1, width: '100%' }}
-        >
+              <Grid item xs={12} md={8} lg={8}>
+                <QuestionEditor />
+              </Grid>
+            </Grid>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="hookgreen"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              {submitButtonText}
+            </Button>
+          </Box>
+
+          <Box sx={{ mt: 6 }} />
           <Divider />
           <Box sx={{ my: 2 }} />
-        </Box>
-      </Box>
+        </>
+      )}
     </Container>
   )
 }
