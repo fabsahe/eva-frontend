@@ -21,8 +21,8 @@ import InfoCard from './InfoCard'
 import AccountMenu from './AccountMenu'
 import MainListItems from './MainListItems'
 import Logo from '../../assets/images/utm-header.jpg'
-import FormListStatistics from '../FormStatistics/FormListStatistics'
-import FormStatistics from '../FormStatistics/FormStatistics'
+import FormListStats from '../FormStats/FormListStats'
+import FormStats from '../FormStats/FormStats'
 
 const drawerWidth = 240
 
@@ -76,8 +76,8 @@ const Drawer = styled(MuiDrawer, {
 function getSection(name) {
   const sections = {
     cuestionarios: <FormList />,
-    estadisticas: <FormListStatistics />,
-    'estadisticas-cuestionario': <FormStatistics />,
+    estadisticas: <FormListStats />,
+    'estadisticas-cuestionario': <FormStats />,
     'nuevo-cuestionario': <FormEditor mode="create" />,
     'editar-cuestionario': <FormEditor mode="edit" />,
     'clonar-cuestionario': <FormEditor mode="clone" />,

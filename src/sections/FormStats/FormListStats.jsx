@@ -27,7 +27,7 @@ const columns = [
   }
 ]
 
-export default function FormListStatistics() {
+export default function FormListStats() {
   const [forms, setForms] = useState([])
   const [currentForm, setCurrentForm] = useState(null)
   const [rows, setRows] = useState([])

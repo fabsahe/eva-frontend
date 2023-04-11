@@ -27,7 +27,7 @@ const filterLabel = {
   group: 'Grupo'
 }
 
-export default function FormStatistics() {
+export default function FormStats() {
   const [questions, setQuestions] = useState([])
   const [allAnswers, setAllAnswers] = useState([])
   const [form, setForm] = useState([])
