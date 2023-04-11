@@ -1,5 +1,5 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material/styles'
 import { SnackbarProvider } from 'notistack'
 import evaTheme from './theme/evaTheme'
@@ -9,8 +9,16 @@ import FormViewer from './sections/FormViewer/FormViewer'
 import Dashboard from './sections/Dashboard/Dashboard'
 import Login from './sections/Login/Login'
 import { AuthProvider } from './context/AuthContext'
+import { useFormActions } from './store/formStore'
 
 export default function App() {
+  const location = useLocation()
+  const { reset } = useFormActions()
+
+  useEffect(() => {
+    reset()
+  }, [location])
+
   return (
     <ThemeProvider theme={evaTheme}>
       <SnackbarProvider {...snackbarProps}>

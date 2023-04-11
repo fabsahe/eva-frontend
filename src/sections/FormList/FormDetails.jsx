@@ -12,7 +12,7 @@ import Alert from '@mui/material/Alert'
 import Chip from '@mui/material/Chip'
 import Snackbar from '@mui/material/Snackbar'
 import dayjs from 'dayjs'
-import { useModalDetails, useFormActions } from '../../store/formStore'
+import { useModalDetails, useFormActions } from '../../store/formListStore'
 
 const styles = {
   header1: {

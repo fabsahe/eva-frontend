@@ -7,8 +7,8 @@ const getOneForm = async (formId) => {
   return data
 }
 
-const findForm = async (title) => {
-  const { data } = await axios.post(`${baseUrl}/find`, { title })
+const availableTitle = async (title, formId) => {
+  const { data } = await axios.post(`${baseUrl}/check`, { title, formId })
   return data.data
 }
 
@@ -40,4 +40,4 @@ const updateOneForm = async (token, formId, formData) => {
   return data
 }
 
-export default { getOneForm, findForm, createNewForm, updateOneForm }
+export default { getOneForm, availableTitle, createNewForm, updateOneForm }

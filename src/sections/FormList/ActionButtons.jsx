@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
 import EditIcon from '@mui/icons-material/Edit'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { useFormActions } from '../../store/formStore'
+import { useFormActions } from '../../store/formListStore'
 
 export default function ActionButtons({ formId }) {
   const { selectForm } = useFormActions()

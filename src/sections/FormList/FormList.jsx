@@ -7,7 +7,7 @@ import axios from 'axios'
 import Loader from '../../common/Loader'
 import ActionButtons from './ActionButtons'
 import FormDetails from './FormDetails'
-import { useFormSelected, useFormActions } from '../../store/formStore'
+import { useFormSelected, useFormActions } from '../../store/formListStore'
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 80 },
