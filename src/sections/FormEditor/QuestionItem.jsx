@@ -38,7 +38,11 @@ export default function QuestionItem({ question, index }) {
       setQuestionType('open')
     } else {
       setQuestionType('options')
-      setOptions(questionSelected.opciones)
+      const currentOptions = questionSelected.opciones.map((item, k) => ({
+        _id: k + 1,
+        texto: item.texto
+      }))
+      setOptions(currentOptions)
     }
   }
 

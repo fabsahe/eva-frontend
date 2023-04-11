@@ -146,16 +146,15 @@ export default function Identification({ mode, careerList, periodList }) {
           ) : null}
         </Grid>
         <Grid item md={6} lg={6}>
-          <FormControl fullWidth disabled={!emptyForm}>
+          <FormControl fullWidth disabled={!emptyForm || !periodOptions}>
             <InputLabel id="period-select-label">Periodo</InputLabel>
             <Select
               labelId="period-select-label"
               id="period-form-select"
-              value={period}
+              value={periodOptions?.nombres.length > 1 ? period : ''}
               label="Periodo"
               onChange={handleChangePeriod}
               required
-              disabled={!periodOptions}
             >
               {periodOptions?.nombres &&
                 periodOptions.nombres.map((option) => (

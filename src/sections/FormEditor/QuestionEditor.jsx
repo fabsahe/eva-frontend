@@ -74,6 +74,14 @@ export default function QuestionEditor() {
     setOptions(newOptions)
   }
 
+  const addOption = () => {
+    const lastId = options.at(-1)._id
+    const newId = lastId + 1
+    const prevOptions = options
+    const newOptions = [...prevOptions, { _id: newId, texto: '' }]
+    setOptions(newOptions)
+  }
+
   const newQuestion = () => {
     const prevQuestions = questions
     if (questionSentence === '' || questionType === '') {
@@ -109,25 +117,21 @@ export default function QuestionEditor() {
     setOptions([])
   }
 
-  const addOption = () => {
-    const lastId = options.at(-1)._id
-    const newId = lastId + 1
-    const prevOptions = options
-    const newOptions = [...prevOptions, { _id: newId, texto: '' }]
-    setOptions(newOptions)
-  }
-
   const updateQuestion = () => {
-    setQuestionMode('new')
-    const questionSelected = questions.find(
+    const questionIndex = questions.findIndex(
       (item) => item._id === questionToEdit
     )
-    questionSelected.pregunta = questionSentence
-    questionSelected.opciones = options
+    const newQuestionsUpdate = questions
+    newQuestionsUpdate[questionIndex].pregunta = questionSentence
+    newQuestionsUpdate[questionIndex].opciones = options
+
+    console.log(newQuestionsUpdate)
+    setQuestions([...newQuestionsUpdate])
 
     setQuestionSentence('')
     setQuestionType('')
     setOptions([])
+    setQuestionMode('new')
   }
 
   const handleQuestion = () => {
