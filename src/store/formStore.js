@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 const today = dayjs()
 
 const useFormStore = create((set) => ({
+  scroll: false,
   emptyForm: true,
   title: '',
   year: '',
@@ -18,6 +19,7 @@ const useFormStore = create((set) => ({
   questionType: '',
   options: [],
   actions: {
+    setScroll: (value) => set({ scroll: value }),
     setEmptyForm: (value) => set({ emptyForm: value }),
     setTitle: (value) => set({ title: value }),
     setYear: (value) => set({ year: value }),
@@ -50,6 +52,7 @@ const useFormStore = create((set) => ({
   }
 }))
 
+export const useScroll = () => useFormStore((state) => state.scroll)
 export const useEmptyForm = () => useFormStore((state) => state.emptyForm)
 export const useTitle = () => useFormStore((state) => state.title)
 export const useYear = () => useFormStore((state) => state.year)

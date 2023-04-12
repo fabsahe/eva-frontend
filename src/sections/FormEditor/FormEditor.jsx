@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate, useParams } from 'react-router-dom'
 import Button from '@mui/material/Button'
@@ -19,6 +19,7 @@ import QuestionEditor from './QuestionEditor'
 import Loader from '../../common/Loader'
 import { useUserToken, useAuthActions } from '../../store/authStore'
 import {
+  useScroll,
   useEmptyForm,
   useTitle,
   useYear,
@@ -41,9 +42,12 @@ export default function FormEditor({ mode }) {
   const [periodList, setPeriodList] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const bottomRef = useRef(null)
+
   const token = useUserToken()
   const { getUserToken } = useAuthActions()
 
+  const scroll = useScroll()
   const emptyForm = useEmptyForm()
   const title = useTitle()
   const year = useYear()
@@ -53,6 +57,7 @@ export default function FormEditor({ mode }) {
   const endDate = useEndDate()
   const questions = useQuestions()
   const {
+    setScroll,
     setEmptyForm,
     setTitle,
     setCareers,
@@ -69,6 +74,10 @@ export default function FormEditor({ mode }) {
   const formId = params.id
 
   const submitButtonText = modeSubmitButtons[mode] || 'enviar'
+
+  const executeScroll = () => {
+    bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const sortCareers = (allCareers) => {
     allCareers.sort((a, b) => {
@@ -211,6 +220,13 @@ export default function FormEditor({ mode }) {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (scroll) {
+      executeScroll()
+      setScroll(false)
+    }
+  }, [scroll])
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       {loading ? (
@@ -238,7 +254,10 @@ export default function FormEditor({ mode }) {
                   </Grid>
                 ))}
 
+              <Grid item xs={12} md={4} lg={4} />
+
               <Grid item xs={12} md={8} lg={8}>
+                <div ref={bottomRef} style={{ scrollMargin: 80 }} />
                 <QuestionEditor />
               </Grid>
             </Grid>
@@ -254,7 +273,7 @@ export default function FormEditor({ mode }) {
             </Button>
           </Box>
 
-          <Box sx={{ mt: 6 }} />
+          <Box sx={{ mt: 4 }} />
           <Divider />
           <Box sx={{ my: 2 }} />
         </>

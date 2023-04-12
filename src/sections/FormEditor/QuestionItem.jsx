@@ -21,6 +21,7 @@ export default function QuestionItem({ question, index }) {
   const emptyForm = useEmptyForm()
   const questions = useQuestions()
   const {
+    setScroll,
     setQuestions,
     setQuestionMode,
     setQuestionToEdit,
@@ -44,6 +45,7 @@ export default function QuestionItem({ question, index }) {
       }))
       setOptions(currentOptions)
     }
+    setScroll(true)
   }
 
   const removeQuestion = (questionId) => {
