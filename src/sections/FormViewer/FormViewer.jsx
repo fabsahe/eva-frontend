@@ -426,7 +426,7 @@ export default function FormViewer() {
               </Grid>
 
               <Box
-                m={1}
+                sx={{ my: 4 }}
                 display="flex"
                 justifyContent="flex-end"
                 alignItems="flex-end"

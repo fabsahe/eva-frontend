@@ -171,8 +171,14 @@ export default function FormStats() {
   useEffect(() => {
     if (imageData.length > 0) {
       const invalidCharsRegex = /[^\w\s]/gi // expresión regular que busca todos los caracteres no válidos
-      const fileName = title
-        .toLowerCase()
+      const formattedTitle = title
+        .toLocaleLowerCase()
+        .replace('á', 'a')
+        .replace('é', 'e')
+        .replace('í', 'i')
+        .replace('ó', 'o')
+        .replace('ú', 'u')
+      const fileName = formattedTitle
         .replace(invalidCharsRegex, '_')
         .replace(/\s+/g, '_')
 
