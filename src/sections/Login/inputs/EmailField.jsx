@@ -62,7 +62,11 @@ export default function EmailField({
         error={error}
         autoFocus={focus}
       />
-      <FormHelperText id="email-error" error={error} sx={{ height: 4 }}>
+      <FormHelperText
+        id="email-error"
+        error={error}
+        sx={{ height: 4, mt: -0.1 }}
+      >
         {error ? 'El correo tiene un formato incorrecto' : ''}
       </FormHelperText>
     </FormControl>

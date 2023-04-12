@@ -21,6 +21,8 @@ export default function PasswordField({
   const [passValidate, setPassValidate] = useState(false)
   const [show, setShow] = useState(false)
 
+  const inputId = `password-field-${Math.random().toString(16).slice(2)}`
+
   const validatePassword = (e, source) => {
     e.preventDefault()
 
@@ -55,7 +57,7 @@ export default function PasswordField({
   }
 
   return (
-    <FormControl sx={{ mt: 1.5 }} variant="outlined" fullWidth>
+    <FormControl sx={{ my: 1 }} variant="outlined" fullWidth>
       <InputLabel htmlFor="password-field" error={error} required>
         {label}
       </InputLabel>
@@ -65,7 +67,7 @@ export default function PasswordField({
         type={show ? 'text' : 'password'}
         label={label}
         name="password-field"
-        id="password-field"
+        id={inputId}
         autoComplete="password-field"
         value={password}
         onBlur={(e) => activateValidation(e)}
@@ -85,7 +87,11 @@ export default function PasswordField({
           </InputAdornment>
         }
       />
-      <FormHelperText id="password-error" error={error} sx={{ height: 4 }}>
+      <FormHelperText
+        id="password-error"
+        error={error}
+        sx={{ height: 4, mt: -0.1 }}
+      >
         {error ? 'La contraseña debe contener al menos 6 caracteres' : ''}
       </FormHelperText>
     </FormControl>

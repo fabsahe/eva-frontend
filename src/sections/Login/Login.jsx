@@ -78,6 +78,7 @@ export default function Login() {
             error={emailError}
             setError={setEmailError}
           />
+          <Box sx={{ mt: 0.2 }} />
 
           <PasswordField
             label="Contraseña"
