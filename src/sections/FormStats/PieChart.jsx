@@ -38,7 +38,7 @@ const generateRandomColors = (count) => {
   })
 }
 
-export default function PieChart({ raw, index }) {
+export default function PieChart({ raw, index, filter }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -52,7 +52,10 @@ export default function PieChart({ raw, index }) {
   const keys = [...map.keys()]
   const values = [...map.values()]
 
-  const colors = useMemo(() => generateRandomColors(keys.length), [keys.length])
+  const colors = useMemo(
+    () => generateRandomColors(keys.length),
+    [keys.length, filter]
+  )
 
   const data = {
     labels: keys,

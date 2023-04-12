@@ -39,6 +39,7 @@ export default function FormStats() {
   const [careerList, setCareerList] = useState([])
   const [professorList, setProfessorList] = useState([])
   const [groupList, setGroupList] = useState([])
+  const [memoFilter, setMemoFilter] = useState(null)
 
   const imageData = useImageData()
   const { startDownload, finishDownload } = useChartActions()
@@ -138,6 +139,11 @@ export default function FormStats() {
 
   const handleChangeFilter = (event) => {
     setFilter(event.target.value)
+    setMemoFilter(event.target.value)
+  }
+
+  const handleGeneratePdf = () => {
+    startDownload()
   }
 
   useEffect(() => {
@@ -161,10 +167,6 @@ export default function FormStats() {
       getAnswers()
     }
   }, [filter])
-
-  const handleGeneratePdf = () => {
-    startDownload()
-  }
 
   useEffect(() => {
     if (imageData.length > 0) {
@@ -235,6 +237,7 @@ export default function FormStats() {
                   <PieChart
                     raw={answers ? answers[itemQ._id] : []}
                     index={index}
+                    filter={memoFilter}
                   />
                 ) : (
                   <ul>
