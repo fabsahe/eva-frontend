@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
@@ -23,8 +22,9 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormLabel from '@mui/material/FormLabel'
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
+import Loader from '../../common/Loader'
 import Logo from '../../assets/images/utm-header.jpg'
-import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
+import { NOTI_ERROR } from '../../constants/notiConstants'
 import answerService from '../../services/answerService'
 
 const steps = [
@@ -49,6 +49,7 @@ export default function FormViewer() {
   const [showForm, setShowForm] = useState(false)
   const [answers, setAnswers] = useState([])
   const [finished, setFinished] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const params = useParams()
   const { formId } = params
@@ -96,30 +97,17 @@ export default function FormViewer() {
     const currentGroups = allGroups.filter(
       (item, index) => allGroups.indexOf(item) === index
     )
-
-    // ordenar grupos
-
-    /*
-    currentGroups.sort((a, b) => {
-      let aNum = parseInt(a.match(/\d+/)[0], 10)
-      let bNum = parseInt(b.match(/\d+/)[0], 10)
-      if (Number.isNaN(aNum)) aNum = 0
-      if (Number.isNaN(bNum)) bNum = 0
-      return aNum - bNum
-    }) */
     // Sub-arreglo de los que tienen la forma 'NUMERO-LETRA'
     const subArray1 = currentGroups.filter((item) =>
       /^\d+-[A-Za-z]$/.test(item)
     )
-
     // Sub-arreglo de los que empiezan con 'P'
     const subArray2 = currentGroups.filter((item) => item.startsWith('P'))
-
     // Sub-arreglo de los que empiezan con 'M' o 'D'
     const subArray3 = currentGroups.filter(
       (item) => item.startsWith('M') || item.startsWith('D')
     )
-
+    // ordenar grupos
     subArray1.sort((a, b) => {
       const aTokens = a.split('-')
       const bTokens = b.split('-')
@@ -196,15 +184,16 @@ export default function FormViewer() {
   }
 
   useEffect(() => {
-    getForm()
+    async function fetchData() {
+      setLoading(true)
+      await getForm()
+      setLoading(false)
+    }
+    fetchData()
   }, [])
 
   return (
-    <Box
-      sx={{
-        display: 'flex'
-      }}
-    >
+    <Box sx={{ display: 'flex' }}>
       <AppBar
         position="absolute"
         sx={{
@@ -233,235 +222,243 @@ export default function FormViewer() {
         </Toolbar>
       </AppBar>
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          height: finished ? '80vh' : '100vh',
-          overflow: 'auto'
-        }}
-      >
-        {visible && !showForm && !finished ? (
-          <Container maxWidth="sm" sx={{ mt: 9 }}>
-            <Typography component="h1" variant="h4">
-              {visible ? title : 'El cuestionario no se encuentra activo'}
-            </Typography>
-            <Box sx={{ mb: 2 }} />
+      {loading ? (
+        <Box component="main" sx={{ flexGrow: 1, mt: 9 }}>
+          <Loader />
+        </Box>
+      ) : (
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            height: finished ? '80vh' : '100vh',
+            overflow: 'auto'
+          }}
+        >
+          {visible && !showForm && !finished ? (
+            <Container maxWidth="sm" sx={{ mt: 9 }}>
+              <Typography component="h1" variant="h4">
+                {visible ? title : 'El cuestionario no se encuentra activo'}
+              </Typography>
+              <Box sx={{ mb: 2 }} />
 
-            <Stepper activeStep={activeStep}>
-              {steps.map((label, index) => {
-                const stepProps = {}
-                const labelProps = {}
-                return (
-                  <Step key={label} {...stepProps}>
-                    <StepLabel {...labelProps}>{label}</StepLabel>
-                  </Step>
-                )
-              })}
-            </Stepper>
-            <Box sx={{ mb: 2 }} />
+              <Stepper activeStep={activeStep}>
+                {steps.map((label) => {
+                  const stepProps = {}
+                  const labelProps = {}
+                  return (
+                    <Step key={label} {...stepProps}>
+                      <StepLabel {...labelProps}>{label}</StepLabel>
+                    </Step>
+                  )
+                })}
+              </Stepper>
+              <Box sx={{ mb: 2 }} />
 
-            {activeStep === 0 && (
-              <>
-                <FormControl fullWidth>
-                  <InputLabel id="career-select-label">Carrera</InputLabel>
-                  <Select
-                    labelId="career-select-label"
-                    id="carer-form-select"
-                    value={career}
-                    label="Carrera"
-                    onChange={handleChangeCareer}
-                    required
-                  >
-                    {careers.map((careerItem) => (
-                      <MenuItem key={careerItem._id} value={careerItem._id}>
-                        {careerItem.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                  <Box sx={{ flex: '1 1 auto' }} />
-                  <Button onClick={handleNextGroups}>Continuar</Button>
-                </Box>
-              </>
-            )}
-
-            {activeStep === 1 && (
-              <>
-                <FormControl fullWidth>
-                  <InputLabel id="group-select-label">Grupo</InputLabel>
-                  <Select
-                    labelId="group-select-label"
-                    id="group-form-select"
-                    value={group}
-                    label="Grupo"
-                    onChange={handleChangeGroup}
-                    required
-                  >
-                    {groups.map((groupItem) => (
-                      <MenuItem key={groupItem} value={groupItem}>
-                        {groupItem}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                  <Button
-                    color="inherit"
-                    disabled={activeStep === 0}
-                    onClick={handleBack}
-                    sx={{ mr: 1 }}
-                  >
-                    Regresar
-                  </Button>
-                  <Box sx={{ flex: '1 1 auto' }} />
-                  <Button onClick={handleNextProfessors}>Continuar</Button>
-                </Box>
-              </>
-            )}
-
-            {activeStep === 2 && (
-              <>
-                <FormControl fullWidth>
-                  <InputLabel id="professor-select-label">Profesor</InputLabel>
-                  <Select
-                    labelId="professor-select-label"
-                    id="professor-form-select"
-                    value={professor}
-                    label="Grupo"
-                    onChange={handleChangeProfessor}
-                    required
-                  >
-                    {professors &&
-                      professors.map((professorItem) => (
-                        <MenuItem
-                          key={professorItem.profesor._id}
-                          value={professorItem.profesor._id}
-                        >
-                          {`${professorItem.profesor.nombre} - ${professorItem.materia.nombre}`}
+              {activeStep === 0 && (
+                <>
+                  <FormControl fullWidth>
+                    <InputLabel id="career-select-label">Carrera</InputLabel>
+                    <Select
+                      labelId="career-select-label"
+                      id="carer-form-select"
+                      value={career}
+                      label="Carrera"
+                      onChange={handleChangeCareer}
+                      required
+                    >
+                      {careers.map((careerItem) => (
+                        <MenuItem key={careerItem._id} value={careerItem._id}>
+                          {careerItem.nombre}
                         </MenuItem>
                       ))}
-                  </Select>
-                </FormControl>
-                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                  <Button
-                    color="inherit"
-                    disabled={activeStep === 0}
-                    onClick={handleBack}
-                    sx={{ mr: 1 }}
-                  >
-                    Regresar
-                  </Button>
-                  <Box sx={{ flex: '1 1 auto' }} />
-                  <Button onClick={handleStart}>Continuar</Button>
-                </Box>
-              </>
-            )}
-          </Container>
-        ) : null}
+                    </Select>
+                  </FormControl>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Button onClick={handleNextGroups}>Continuar</Button>
+                  </Box>
+                </>
+              )}
 
-        {visible && showForm && !finished ? (
-          <Container maxWidth="md" sx={{ mt: 9 }}>
-            <Typography component="h1" variant="h4">
-              {visible ? title : 'El cuestionario no se encuentra activo'}
-            </Typography>
-            <Box sx={{ mb: 2 }} />
-
-            <Grid container spacing={2}>
-              {questions &&
-                questions.map((item, index) => (
-                  <Grid item key={item._id} md={12} lg={12}>
-                    <Paper
-                      sx={{
-                        p: 2,
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
-                      variant="outlined"
+              {activeStep === 1 && (
+                <>
+                  <FormControl fullWidth>
+                    <InputLabel id="group-select-label">Grupo</InputLabel>
+                    <Select
+                      labelId="group-select-label"
+                      id="group-form-select"
+                      value={group}
+                      label="Grupo"
+                      onChange={handleChangeGroup}
+                      required
                     >
-                      <Grid container>
-                        <Grid item md={9}>
-                          <Typography
-                            variant="h6"
-                            component="div"
-                            sx={{ mb: 1 }}
+                      {groups.map((groupItem) => (
+                        <MenuItem key={groupItem} value={groupItem}>
+                          {groupItem}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Button
+                      color="inherit"
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      sx={{ mr: 1 }}
+                    >
+                      Regresar
+                    </Button>
+                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Button onClick={handleNextProfessors}>Continuar</Button>
+                  </Box>
+                </>
+              )}
+
+              {activeStep === 2 && (
+                <>
+                  <FormControl fullWidth>
+                    <InputLabel id="professor-select-label">
+                      Profesor
+                    </InputLabel>
+                    <Select
+                      labelId="professor-select-label"
+                      id="professor-form-select"
+                      value={professor}
+                      label="Grupo"
+                      onChange={handleChangeProfessor}
+                      required
+                    >
+                      {professors &&
+                        professors.map((professorItem) => (
+                          <MenuItem
+                            key={professorItem.profesor._id}
+                            value={professorItem.profesor._id}
                           >
-                            {`${index + 1} - ${item.pregunta}`}
-                          </Typography>
+                            {`${professorItem.profesor.nombre} - ${professorItem.materia.nombre}`}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Button
+                      color="inherit"
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      sx={{ mr: 1 }}
+                    >
+                      Regresar
+                    </Button>
+                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Button onClick={handleStart}>Continuar</Button>
+                  </Box>
+                </>
+              )}
+            </Container>
+          ) : null}
+
+          {visible && showForm && !finished ? (
+            <Container maxWidth="md" sx={{ mt: 9 }}>
+              <Typography component="h1" variant="h4">
+                {visible ? title : 'El cuestionario no se encuentra activo'}
+              </Typography>
+              <Box sx={{ mb: 2 }} />
+
+              <Grid container spacing={2}>
+                {questions &&
+                  questions.map((item, index) => (
+                    <Grid item key={item._id} md={12} lg={12}>
+                      <Paper
+                        sx={{
+                          p: 2,
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                        variant="outlined"
+                      >
+                        <Grid container>
+                          <Grid item md={9}>
+                            <Typography
+                              variant="h6"
+                              component="div"
+                              sx={{ mb: 1 }}
+                            >
+                              {`${index + 1} - ${item.pregunta}`}
+                            </Typography>
+                          </Grid>
+                          <Grid item md={3} />
                         </Grid>
-                        <Grid item md={3} />
-                      </Grid>
 
-                      {item.opciones && item.opciones.length === 0 ? (
-                        <TextField
-                          id={item._id}
-                          fullWidth
-                          hiddenLabel
-                          variant="outlined"
-                          sx={{ mb: 1 }}
-                          placeholder="Respuesta"
-                          onBlur={(e) => handleChangeAnswer(e)}
-                        />
-                      ) : (
-                        <FormControl>
-                          <FormLabel id="demo-radio-buttons-group-label">
-                            Respuestas
-                          </FormLabel>
-                          <RadioGroup
-                            aria-labelledby="demo-radio-buttons-group-label"
-                            name={item._id}
-                            onChange={(e) => handleChangeAnswer(e)}
-                          >
-                            {item.opciones.map((opcion) => (
-                              <FormControlLabel
-                                key={opcion._id}
-                                value={opcion.texto}
-                                control={<Radio />}
-                                label={opcion.texto}
-                              />
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                      )}
-                    </Paper>
-                  </Grid>
-                ))}
-            </Grid>
+                        {item.opciones && item.opciones.length === 0 ? (
+                          <TextField
+                            id={item._id}
+                            fullWidth
+                            hiddenLabel
+                            variant="outlined"
+                            sx={{ mb: 1 }}
+                            placeholder="Respuesta"
+                            onBlur={(e) => handleChangeAnswer(e)}
+                          />
+                        ) : (
+                          <FormControl>
+                            <FormLabel id="demo-radio-buttons-group-label">
+                              Respuestas
+                            </FormLabel>
+                            <RadioGroup
+                              aria-labelledby="demo-radio-buttons-group-label"
+                              name={item._id}
+                              onChange={(e) => handleChangeAnswer(e)}
+                            >
+                              {item.opciones.map((opcion) => (
+                                <FormControlLabel
+                                  key={opcion._id}
+                                  value={opcion.texto}
+                                  control={<Radio />}
+                                  label={opcion.texto}
+                                />
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                        )}
+                      </Paper>
+                    </Grid>
+                  ))}
+              </Grid>
 
-            <Box
-              m={1}
-              display="flex"
-              justifyContent="flex-end"
-              alignItems="flex-end"
-            >
-              <Button variant="contained" onClick={handleSubmit}>
-                Enviar
-              </Button>
-            </Box>
-          </Container>
-        ) : null}
+              <Box
+                m={1}
+                display="flex"
+                justifyContent="flex-end"
+                alignItems="flex-end"
+              >
+                <Button variant="contained" onClick={handleSubmit}>
+                  Enviar
+                </Button>
+              </Box>
+            </Container>
+          ) : null}
 
-        {finished ? (
-          <Container maxWidth="md" sx={{ mt: 9 }}>
-            <Typography component="h1" variant="h4">
-              {title}
-            </Typography>
+          {finished ? (
+            <Container maxWidth="md" sx={{ mt: 9 }}>
+              <Typography component="h1" variant="h4">
+                {title}
+              </Typography>
 
-            <Typography component="h1" variant="h5">
-              Las respuestas se han enviado
-            </Typography>
-          </Container>
-        ) : null}
+              <Typography component="h1" variant="h5">
+                Las respuestas se han enviado
+              </Typography>
+            </Container>
+          ) : null}
 
-        {!visible ? (
-          <Container maxWidth="sm" sx={{ mt: 9 }}>
-            <Typography component="h1" variant="h4">
-              {visible ? title : 'El cuestionario no se encuentra activo'}
-            </Typography>
-          </Container>
-        ) : null}
-      </Box>
+          {!visible ? (
+            <Container maxWidth="sm" sx={{ mt: 9 }}>
+              <Typography component="h1" variant="h4">
+                {visible ? title : 'El cuestionario no se encuentra activo'}
+              </Typography>
+            </Container>
+          ) : null}
+        </Box>
+      )}
     </Box>
   )
 }

@@ -60,8 +60,7 @@ export default function FormEditor({ mode }) {
     setPeriod,
     setStartDate,
     setEndDate,
-    setQuestions,
-    reset
+    setQuestions
   } = useFormActions()
 
   const { enqueueSnackbar: noti } = useSnackbar()
@@ -133,7 +132,6 @@ export default function FormEditor({ mode }) {
       if (response.status === 'OK') {
         noti('Cuestionario creado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
-        reset()
       }
     } catch (error) {
       noti(error.mesage, NOTI_ERROR)
@@ -146,7 +144,6 @@ export default function FormEditor({ mode }) {
       if (response.status === 'OK') {
         noti('Cuestionario actualizado', NOTI_SUCCESS)
         navigate('/dashboard/cuestionarios')
-        reset()
       }
     } catch (error) {
       noti(error.mesage, NOTI_ERROR)
