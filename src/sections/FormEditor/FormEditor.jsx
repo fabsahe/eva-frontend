@@ -254,8 +254,6 @@ export default function FormEditor({ mode }) {
                   </Grid>
                 ))}
 
-              <Grid item xs={12} md={4} lg={4} />
-
               <Grid item xs={12} md={8} lg={8}>
                 <div ref={bottomRef} style={{ scrollMargin: 80 }} />
                 <QuestionEditor />

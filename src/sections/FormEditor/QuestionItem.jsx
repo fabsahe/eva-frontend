@@ -1,6 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React from 'react'
 import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
@@ -11,6 +14,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import Typography from '@mui/material/Typography'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 import {
   useEmptyForm,
   useQuestions,
@@ -68,14 +73,14 @@ export default function QuestionItem({ question, index }) {
     >
       <Grid container>
         <Grid item md={9}>
-          <Typography variant="h6" component="div" sx={{ mb: 1 }}>
+          <Typography variant="h6" component="h1" sx={{ mb: 1 }}>
             {`${index + 1} - ${question.pregunta}`}
           </Typography>
         </Grid>
         <Grid item md={3}>
           {emptyForm ? (
             <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
-              <Button
+              {/* <Button
                 sx={{ mr: 0.5 }}
                 variant="outlined"
                 size="small"
@@ -91,7 +96,26 @@ export default function QuestionItem({ question, index }) {
                 onClick={() => removeQuestion(question._id)}
               >
                 Eliminar
-              </Button>
+          </Button> */}
+              <Tooltip title="Editar">
+                <IconButton
+                  aria-label="edit-question"
+                  color="success"
+                  onClick={() => editQuestion(question._id)}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Eliminar">
+                <IconButton
+                  aria-label="delete-question"
+                  color="error"
+                  onClick={() => removeQuestion(question._id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           ) : null}
         </Grid>

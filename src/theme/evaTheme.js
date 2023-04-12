@@ -26,7 +26,7 @@ const evaTheme = createTheme({
       main: '#3c91e6'
     },
     error: {
-      main: '#c3423f'
+      main: '#ad2831'
     }
   }
 })

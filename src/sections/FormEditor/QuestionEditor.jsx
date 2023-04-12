@@ -1,7 +1,10 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
+import Tooltip from '@mui/material/Tooltip'
 import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import Radio from '@mui/material/Radio'
@@ -10,7 +13,9 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import Typography from '@mui/material/Typography'
+import IconButton from '@mui/material/IconButton'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import RestorePageIcon from '@mui/icons-material/RestorePage'
 import { useSnackbar } from 'notistack'
 import {
   useEmptyForm,
@@ -140,6 +145,18 @@ export default function QuestionEditor() {
     } else if (questionMode === 'edit') {
       updateQuestion()
     }
+
+    setQuestionSentence('')
+    setQuestionType('')
+    setOptions([])
+    setQuestionMode('new')
+  }
+
+  const undoQuestion = () => {
+    setQuestionSentence('')
+    setQuestionType('')
+    setOptions([])
+    setQuestionMode('new')
   }
 
   return (
@@ -152,9 +169,30 @@ export default function QuestionEditor() {
             flexDirection: 'column'
           }}
         >
-          <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
-            {questionModeText}
-          </Typography>
+          <Grid container>
+            <Grid item md={10}>
+              <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
+                {questionModeText}
+              </Typography>
+            </Grid>
+            <Grid item md={2}>
+              <Box
+                display="flex"
+                justifyContent="flex-end"
+                alignItems="flex-start"
+              >
+                <Tooltip title="Deshacer">
+                  <IconButton
+                    aria-label="undo"
+                    color="success"
+                    onClick={undoQuestion}
+                  >
+                    <RestorePageIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Grid>
+          </Grid>
 
           <TextField
             variant="outlined"
