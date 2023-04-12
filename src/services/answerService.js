@@ -1,14 +1,15 @@
 import axios from 'axios'
+import API_URL from '../constants/api'
 
-const baseUrl = 'http://localhost:3001/api/answers'
+const baseURL = `${API_URL}/api/answers`
 
 const getAnswers = async (formId) => {
-  const { data } = await axios.get(`${baseUrl}/${formId}`)
+  const { data } = await axios.get(`${baseURL}/${formId}`)
   return data
 }
 
 const createNewAnswer = async (answers) => {
-  const response = await axios.post(baseUrl, answers)
+  const response = await axios.post(baseURL, answers)
   return response
 }
 

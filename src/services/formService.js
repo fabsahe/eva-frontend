@@ -1,14 +1,15 @@
 import axios from 'axios'
+import API_URL from '../constants/api'
 
-const baseUrl = 'http://localhost:3001/api/forms'
+const baseURL = `${API_URL}/api/forms`
 
 const getOneForm = async (formId) => {
-  const { data } = await axios.get(`${baseUrl}/${formId}`)
+  const { data } = await axios.get(`${baseURL}/${formId}`)
   return data
 }
 
 const availableTitle = async (title, formId) => {
-  const { data } = await axios.post(`${baseUrl}/check`, { title, formId })
+  const { data } = await axios.post(`${baseURL}/check`, { title, formId })
   return data.data
 }
 
@@ -18,11 +19,7 @@ const createNewForm = async (token, formData) => {
       Authorization: `Bearer ${token}`
     }
   }
-  const { data } = await axios.post(
-    'http://localhost:3001/api/forms',
-    formData,
-    config
-  )
+  const { data } = await axios.post(baseURL, formData, config)
   return data
 }
 
@@ -32,11 +29,7 @@ const updateOneForm = async (token, formId, formData) => {
       Authorization: `Bearer ${token}`
     }
   }
-  const { data } = await axios.put(
-    `http://localhost:3001/api/forms/${formId}`,
-    formData,
-    config
-  )
+  const { data } = await axios.put(`${baseURL}/${formId}`, formData, config)
   return data
 }
 

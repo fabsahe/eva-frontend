@@ -17,6 +17,7 @@ import Configuration from './Configuration'
 import QuestionItem from './QuestionItem'
 import QuestionEditor from './QuestionEditor'
 import Loader from '../../common/Loader'
+import { useUserToken, useAuthActions } from '../../store/authStore'
 import {
   useEmptyForm,
   useTitle,
@@ -39,7 +40,9 @@ export default function FormEditor({ mode }) {
   const [careerList, setCareerList] = useState([])
   const [periodList, setPeriodList] = useState([])
   const [loading, setLoading] = useState(true)
-  const [token, setToken] = useState('')
+
+  const token = useUserToken()
+  const { getUserToken } = useAuthActions()
 
   const emptyForm = useEmptyForm()
   const title = useTitle()
@@ -203,11 +206,7 @@ export default function FormEditor({ mode }) {
       }
       setLoading(false)
     }
-    const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setToken(user.token)
-    }
+    getUserToken()
     fetchData()
   }, [])
 
