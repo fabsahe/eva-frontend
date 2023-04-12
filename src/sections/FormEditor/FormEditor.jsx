@@ -156,7 +156,11 @@ export default function FormEditor({ mode }) {
       noti('El cuestionario está vacío', NOTI_ERROR)
       return
     }
-    const isAvailable = await formService.availableTitle(title.trim(), formId)
+    const formIdToCheck = mode === 'clone' ? null : formId
+    const isAvailable = await formService.availableTitle(
+      title.trim(),
+      formIdToCheck
+    )
     if (!isAvailable) {
       noti('El título ya existe', NOTI_ERROR)
       return
