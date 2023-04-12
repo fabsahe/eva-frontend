@@ -10,7 +10,7 @@ const useAuthStore = create((set) => ({
       if (loggedUserJSON) {
         const user = JSON.parse(loggedUserJSON)
         set({ token: user.token })
-        set({ username: user.username })
+        set({ username: user.email })
       }
     }
   }
