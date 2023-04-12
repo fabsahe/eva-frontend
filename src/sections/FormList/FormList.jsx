@@ -3,10 +3,11 @@ import { DataGrid, esES } from '@mui/x-data-grid'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import axios from 'axios'
 import Loader from '../../common/Loader'
 import ActionButtons from './ActionButtons'
 import FormDetails from './FormDetails'
+import formService from '../../services/formService'
+import { useUserToken, useAuthActions } from '../../store/authStore'
 import { useFormSelected, useFormActions } from '../../store/formListStore'
 
 const columns = [
@@ -32,14 +33,17 @@ export default function FormList() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
 
+  const token = useUserToken()
+  const { getUserToken } = useAuthActions()
+
   const formSelected = useFormSelected()
   const { showModalDetails } = useFormActions()
 
   const getAllForms = async () => {
     try {
       setLoading(true)
-      const response = await axios.get('http://localhost:3001/api/forms')
-      const { data } = response.data
+      const response = await formService.getAllForms(token)
+      const { data } = response
       setForms(data)
       const rowsData = data.map((form, index) => ({
         id: index + 1,
@@ -56,8 +60,14 @@ export default function FormList() {
   }
 
   useEffect(() => {
-    getAllForms()
+    getUserToken()
   }, [])
+
+  useEffect(() => {
+    if (token) {
+      getAllForms()
+    }
+  }, [token])
 
   useEffect(() => {
     if (formSelected) {

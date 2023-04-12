@@ -23,6 +23,11 @@ import MainListItems from './MainListItems'
 import Logo from '../../assets/images/utm-header.jpg'
 import FormListStats from '../FormStats/FormListStats'
 import FormStats from '../FormStats/FormStats'
+import {
+  useUserToken,
+  useUsername,
+  useAuthActions
+} from '../../store/authStore'
 
 const drawerWidth = 240
 
@@ -88,16 +93,16 @@ function getSection(name) {
 
 export default function Dashboard() {
   const [open, setOpen] = useState(true)
-  const [username, setUsername] = useState('')
+  // const [username, setUsername] = useState('')
 
   const params = useParams()
 
+  const token = useUserToken()
+  const username = useUsername()
+  const { getUserToken } = useAuthActions()
+
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedEvaAppUser')
-    if (loggedUserJSON) {
-      const currentUser = JSON.parse(loggedUserJSON)
-      setUsername(currentUser.email)
-    }
+    getUserToken()
   }, [])
 
   const toggleDrawer = () => {
@@ -188,7 +193,7 @@ export default function Dashboard() {
             <Grid container spacing={3}>
               {/* Nuevo pedido */}
               <Grid item xs={12} md={3} lg={3}>
-                <InfoCard />
+                {token && <InfoCard token={token} />}
               </Grid>
             </Grid>
           </Container>

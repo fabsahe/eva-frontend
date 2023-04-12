@@ -3,6 +3,16 @@ import API_URL from '../constants/api'
 
 const baseURL = `${API_URL}/api/forms`
 
+const getAllForms = async (token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+  const { data } = await axios.get(`${baseURL}`, config)
+  return data
+}
+
 const getOneForm = async (formId) => {
   const { data } = await axios.get(`${baseURL}/${formId}`)
   return data
@@ -33,4 +43,10 @@ const updateOneForm = async (token, formId, formData) => {
   return data
 }
 
-export default { getOneForm, availableTitle, createNewForm, updateOneForm }
+export default {
+  getAllForms,
+  getOneForm,
+  availableTitle,
+  createNewForm,
+  updateOneForm
+}

@@ -1,17 +1,18 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer'
-import axios from 'axios'
+import formService from '../../services/formService'
 
-export default function InfoCard() {
+export default function InfoCard({ token }) {
   const [number, setNumber] = useState(0)
 
   const getFormsNumber = async () => {
-    const response = await axios.get('http://localhost:3001/api/forms')
-    const { data } = response.data
+    const response = await formService.getAllForms(token)
+    const { data } = response
     setNumber(data.length)
   }
 
