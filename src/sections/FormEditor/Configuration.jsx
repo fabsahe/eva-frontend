@@ -23,7 +23,7 @@ export default function Configuration({ mode }) {
         flexDirection: 'column'
       }}
     >
-      <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
+      <Typography variant="h6" component="h1" sx={{ mb: 2 }}>
         Configuración
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">

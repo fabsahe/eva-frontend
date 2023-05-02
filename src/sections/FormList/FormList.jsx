@@ -48,9 +48,9 @@ export default function FormList() {
       const rowsData = data.map((form, index) => ({
         id: index + 1,
         uid: form._id,
-        title: form.titulo,
-        period: `${form.año}-${form.periodo}`,
-        user: form.usuario.name
+        title: form.title,
+        period: `${form.year}-${form.period}`,
+        user: form.user.name
       }))
       setRows(rowsData)
       setLoading(false)

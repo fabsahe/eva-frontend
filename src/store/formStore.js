@@ -2,6 +2,14 @@ import { create } from 'zustand'
 import dayjs from 'dayjs'
 
 const today = dayjs()
+const initOptions = {
+  radios: [],
+  checkboxes: [],
+  scale: [],
+  labels: [],
+  rows: [],
+  cols: []
+}
 
 const useFormStore = create((set) => ({
   scroll: false,
@@ -17,7 +25,7 @@ const useFormStore = create((set) => ({
   questionToEdit: null,
   questionSentence: '',
   questionType: '',
-  options: [],
+  options: { ...initOptions },
   actions: {
     setScroll: (value) => set({ scroll: value }),
     setEmptyForm: (value) => set({ emptyForm: value }),
@@ -32,7 +40,7 @@ const useFormStore = create((set) => ({
     setQuestionToEdit: (questionId) => set({ questionToEdit: questionId }),
     setQuestionSentence: (sentence) => set({ questionSentence: sentence }),
     setQuestionType: (type) => set({ questionType: type }),
-    setOptions: (arr) => set({ options: arr }),
+    setOptions: (obj) => set({ options: obj }),
     reset: () =>
       set({
         emptyForm: true,
@@ -47,7 +55,14 @@ const useFormStore = create((set) => ({
         questionToEdit: null,
         questionSentence: '',
         questionType: '',
-        options: []
+        options: { ...initOptions }
+      }),
+    resetQuestion: () =>
+      set({
+        questionSentence: '',
+        questionType: '',
+        options: { ...initOptions },
+        questionMode: 'new'
       })
   }
 }))

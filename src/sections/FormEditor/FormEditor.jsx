@@ -1,11 +1,18 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate, useParams } from 'react-router-dom'
+import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
+import Tooltip from '@mui/material/Tooltip'
+import IconButton from '@mui/material/IconButton'
+import RestoreIcon from '@mui/icons-material/Restore'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { grey } from '@mui/material/colors'
 import axios from 'axios'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
@@ -14,7 +21,7 @@ import formService from '../../services/formService'
 import answerService from '../../services/answerService'
 import Identification from './Identification'
 import Configuration from './Configuration'
-import QuestionItem from './QuestionItem'
+import QuestionPreview from './QuestionPreview'
 import QuestionEditor from './QuestionEditor'
 import Loader from '../../common/Loader'
 import { useUserToken, useAuthActions } from '../../store/authStore'
@@ -140,7 +147,7 @@ export default function FormEditor({ mode }) {
       const response = await formService.createNewForm(token, formData)
       if (response.status === 'OK') {
         noti('Cuestionario creado', NOTI_SUCCESS)
-        navigate('/dashboard/cuestionarios')
+        // navigate('/dashboard/cuestionarios')
       }
     } catch (error) {
       noti(error.mesage, NOTI_ERROR)
@@ -179,22 +186,22 @@ export default function FormEditor({ mode }) {
       return
     }
 
-    const newQuestions = questions.map((item) => ({
+    /* const newQuestions = questions.map((item) => ({
       pregunta: item.pregunta,
       opciones: item.opciones.map((op) => ({ texto: op.texto }))
-    }))
+    })) */
 
     const newForm = {
-      titulo: title.trim(),
-      año: year,
-      periodo: period,
-      carreras: careers,
-      items: newQuestions,
-      fechaInicio:
+      title: title.trim(),
+      year,
+      period,
+      careers,
+      questions,
+      startDate:
         typeof startDate === 'string'
           ? startDate
           : startDate.format('YYYY-MM-DD'),
-      fechaFin:
+      endDate:
         typeof endDate === 'string' ? endDate : endDate.format('YYYY-MM-DD')
     }
 
@@ -234,7 +241,7 @@ export default function FormEditor({ mode }) {
       ) : (
         <>
           <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={8} lg={8}>
                 <Identification
                   mode={mode}
@@ -246,19 +253,17 @@ export default function FormEditor({ mode }) {
               <Grid item xs={12} md={4} lg={4}>
                 <Configuration mode={mode} />
               </Grid>
-
-              {questions &&
-                questions.map((question, index) => (
-                  <Grid item key={question._id} xs={12} md={8} lg={8}>
-                    <QuestionItem question={question} index={index} />
-                  </Grid>
-                ))}
-
-              <Grid item xs={12} md={8} lg={8}>
-                <div ref={bottomRef} style={{ scrollMargin: 80 }} />
-                <QuestionEditor />
-              </Grid>
             </Grid>
+
+            {questions.map((question, index) => (
+              <QuestionPreview
+                key={question.id}
+                question={question}
+                index={index}
+              />
+            ))}
+
+            {emptyForm ? <QuestionEditor /> : null}
 
             <Button
               type="submit"

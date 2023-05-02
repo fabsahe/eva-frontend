@@ -1,24 +1,18 @@
-/* eslint-disable react/prop-types */
 import React from 'react'
-import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Tooltip from '@mui/material/Tooltip'
 import TextField from '@mui/material/TextField'
-import Stack from '@mui/material/Stack'
-import Radio from '@mui/material/Radio'
-import RadioGroup from '@mui/material/RadioGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import FormControl from '@mui/material/FormControl'
-import FormLabel from '@mui/material/FormLabel'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import RestorePageIcon from '@mui/icons-material/RestorePage'
+import RestoreIcon from '@mui/icons-material/Restore'
+import { grey } from '@mui/material/colors'
 import { useSnackbar } from 'notistack'
+import TypeSelect from './inputs/TypeSelect'
+import Radios from './inputs/Radios'
 import {
-  useEmptyForm,
   useQuestions,
   useQuestionMode,
   useQuestionToEdit,
@@ -27,99 +21,48 @@ import {
   useOptions,
   useFormActions
 } from '../../store/formStore'
+import Checkboxes from './inputs/Checkboxes'
+import Scale from './inputs/Scale'
+import RadioGrid from './inputs/RadioGrid'
+
+const typeEditor = {
+  'open-ended': null,
+  radios: <Radios />,
+  checkboxes: <Checkboxes />,
+  scale: <Scale />,
+  grid: <RadioGrid />
+}
+
+const titles = {
+  new: 'Agregar pregunta',
+  edit: 'Actualizar pregunta'
+}
 
 export default function QuestionEditor() {
-  const emptyForm = useEmptyForm()
   const questions = useQuestions()
   const questionMode = useQuestionMode()
   const questionToEdit = useQuestionToEdit()
   const questionSentence = useQuestionSentence()
   const questionType = useQuestionType()
   const options = useOptions()
-  const {
-    setQuestions,
-    setQuestionMode,
-    setQuestionSentence,
-    setQuestionType,
-    setOptions
-  } = useFormActions()
+  const { setQuestions, setQuestionSentence, resetQuestion } = useFormActions()
 
   const { enqueueSnackbar: noti } = useSnackbar()
 
-  const questionModeText =
-    questionMode === 'new' ? 'Agregar pregunta' : 'Actualizar pregunta'
+  const editorTitle = titles[questionMode] ?? ''
 
   const handleChangeQuestion = (event) => {
     setQuestionSentence(event.target.value)
   }
 
-  const handleChangeType = (event) => {
-    setQuestionType(event.target.value)
-    if (event.target.value === 'open') {
-      setOptions([])
-      return
-    }
-    if (event.target.value === 'options') {
-      const prevOptions = options
-      const newOptions = [
-        ...prevOptions,
-        {
-          _id: 1,
-          texto: ''
-        }
-      ]
-      setOptions(newOptions)
-    }
-  }
-
-  const handleChangeOptions = (event, id) => {
-    const index = id - 1
-    const newOptions = [...options]
-    newOptions[index].texto = event.target.value
-    setOptions(newOptions)
-  }
-
-  const addOption = () => {
-    const lastId = options.at(-1)._id
-    const newId = lastId + 1
-    const prevOptions = options
-    const newOptions = [...prevOptions, { _id: newId, texto: '' }]
-    setOptions(newOptions)
-  }
-
   const newQuestion = () => {
     const prevQuestions = questions
-    if (questionSentence === '' || questionType === '') {
-      noti('Faltan datos')
-      return
-    }
-    if (options.length > 0 && options.at(-1).texto === 'Texto de la opción') {
-      options.pop()
-    }
-    if (questions.length === 0) {
-      const newQuestions = [
-        ...prevQuestions,
-        {
-          _id: 0,
-          pregunta: questionSentence,
-          opciones: options
-        }
-      ]
-      setQuestions(newQuestions)
-      setQuestionSentence('')
-      setQuestionType('')
-      setOptions([])
-      return
-    }
-    const _id = questions.at(-1)._id + 1
+    const id = questions.length === 0 ? 0 : questions.at(-1).id + 1
     const newQuestions = [
       ...prevQuestions,
-      { _id, pregunta: questionSentence, opciones: options }
+      { id, sentence: questionSentence, type: questionType, options }
     ]
     setQuestions(newQuestions)
-    setQuestionSentence('')
-    setQuestionType('')
-    setOptions([])
   }
 
   const updateQuestion = () => {
@@ -128,147 +71,97 @@ export default function QuestionEditor() {
     )
     const newQuestionsUpdate = questions
     newQuestionsUpdate[questionIndex].pregunta = questionSentence
-    newQuestionsUpdate[questionIndex].opciones = options
+    newQuestionsUpdate[questionIndex].opciones = []
 
-    console.log(newQuestionsUpdate)
     setQuestions([...newQuestionsUpdate])
-
-    setQuestionSentence('')
-    setQuestionType('')
-    setOptions([])
-    setQuestionMode('new')
   }
 
-  const handleQuestion = () => {
+  const handleAddQuestion = () => {
+    if (questionSentence === '' || questionType === '') {
+      noti('Faltan datos')
+      return
+    }
     if (questionMode === 'new') {
       newQuestion()
     } else if (questionMode === 'edit') {
       updateQuestion()
     }
-
-    setQuestionSentence('')
-    setQuestionType('')
-    setOptions([])
-    setQuestionMode('new')
+    resetQuestion()
   }
 
   const undoQuestion = () => {
-    setQuestionSentence('')
-    setQuestionType('')
-    setOptions([])
-    setQuestionMode('new')
+    resetQuestion()
   }
 
   return (
-    <div>
-      {emptyForm ? (
+    <Grid container spacing={2} sx={{ mt: 1 }} alignItems="center">
+      <Grid item xs={12} md={8} lg={8}>
         <Paper
           sx={{
-            p: 2,
+            py: 1.8,
+            px: 2,
             display: 'flex',
             flexDirection: 'column'
           }}
         >
           <Grid container>
-            <Grid item md={10}>
-              <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
-                {questionModeText}
-              </Typography>
-            </Grid>
-            <Grid item md={2}>
-              <Box
-                display="flex"
-                justifyContent="flex-end"
-                alignItems="flex-start"
+            <Grid item md={12}>
+              <Typography
+                variant="subtitle1"
+                component="h1"
+                sx={{ mb: 1.5, fontWeight: 500, fontSize: 18 }}
               >
-                <Tooltip title="Deshacer">
-                  <IconButton
-                    aria-label="undo"
-                    color="success"
-                    onClick={undoQuestion}
-                  >
-                    <RestorePageIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+                {editorTitle}
+              </Typography>
             </Grid>
           </Grid>
 
           <TextField
             variant="outlined"
-            placeholder="Texto de la pregunta"
-            sx={{ mb: 1 }}
+            label="Texto de la pregunta"
+            sx={{ mb: 2 }}
             onChange={handleChangeQuestion}
             value={questionSentence}
             autoComplete="off"
             fullWidth
-            hiddenLabel
           />
 
-          <FormControl>
-            <FormLabel id="demo-row-radio-buttons-group-label">Tipo</FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="demo-row-radio-buttons-group-label"
-              name="row-radio-buttons-group"
-              value={questionType}
-              onChange={handleChangeType}
-            >
-              <FormControlLabel
-                value="open"
-                control={<Radio />}
-                label="Pregunta abierta"
+          <Grid container spacing={2}>
+            <Grid item md={6}>
+              <TypeSelect />
+            </Grid>
+            <Grid item md={6}>
+              <Box
+                display="flex"
+                justifyContent="flex-end"
+                alignItems="flex-start"
               />
-              <FormControlLabel
-                value="options"
-                control={<Radio />}
-                label="Opciones"
-              />
-            </RadioGroup>
-          </FormControl>
+            </Grid>
+          </Grid>
 
-          {questionType === 'options' && (
-            <Typography component="h1" variant="subtitle2">
-              Opciones
-            </Typography>
-          )}
-          <Stack sx={{ width: '100%' }}>
-            {options &&
-              options.map((option) => (
-                <TextField
-                  key={option._id}
-                  variant="outlined"
-                  placeholder="Texto de la opción"
-                  sx={{ mb: 1 }}
-                  value={option.texto}
-                  onChange={(event) => handleChangeOptions(event, option._id)}
-                  onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
-                  autoComplete="off"
-                  hiddenLabel
-                />
-              ))}
-          </Stack>
+          {typeEditor[questionType] ?? null}
 
-          {questionType === 'options' && (
-            <Button
-              variant="outlined"
-              startIcon={<AddCircleOutlineIcon />}
-              onClick={addOption}
-              sx={{ mt: 1, mb: 1 }}
-            >
-              Agregar opción
-            </Button>
-          )}
-
-          <Button
-            variant="contained"
-            startIcon={<AddCircleOutlineIcon />}
-            onClick={handleQuestion}
-          >
-            {questionModeText}
-          </Button>
+          <Box sx={{ my: 1 }} />
         </Paper>
-      ) : null}
-    </div>
+      </Grid>
+
+      <Grid item xs={12} md={1} lg={1} justifyContent="center">
+        <Paper sx={{ py: 1, px: 0, width: '65%' }}>
+          <Grid container justifyContent="center">
+            <Tooltip title="Agregar pregunta" placement="right">
+              <IconButton aria-label="add-question" onClick={handleAddQuestion}>
+                <AddCircleOutlineIcon sx={{ color: grey[700] }} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Deshacer" placement="right">
+              <IconButton aria-label="undo" onClick={undoQuestion}>
+                <RestoreIcon sx={{ color: grey[700] }} />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Paper>
+      </Grid>
+    </Grid>
   )
 }
