@@ -72,7 +72,7 @@ export default function QuestionEditor() {
     const updatedQuestions = [...questions]
     updatedQuestions[questionIndex].sentence = questionSentence
     updatedQuestions[questionIndex].type = questionType
-    updatedQuestions[questionIndex].options = options
+    updatedQuestions[questionIndex].options = { ...options }
 
     setQuestions(updatedQuestions)
   }

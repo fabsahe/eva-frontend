@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
@@ -14,6 +14,10 @@ export default function Checkboxes({ options }) {
     newCheckboxes[id].checked = event.target.checked
     setCheckboxes(newCheckboxes)
   }
+
+  useEffect(() => {
+    setCheckboxes([...options.checkboxes])
+  }, [options])
 
   return (
     <FormControl sx={{ m: 0 }} component="fieldset" variant="standard">

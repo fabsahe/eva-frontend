@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
@@ -22,6 +22,9 @@ export default function Scale({ options }) {
     return `De ${firstValue}% a ${value}%`
   }
 
+  useEffect(() => {
+    setSliderValue(scale[0].value)
+  }, [options])
   return (
     <Grid container>
       <Grid item md={2} lg={2}>
