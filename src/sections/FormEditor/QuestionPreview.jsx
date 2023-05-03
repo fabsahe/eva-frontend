@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React from 'react'
 import IconButton from '@mui/material/IconButton'
@@ -40,12 +41,15 @@ export default function QuestionPreview({ question, index }) {
     grid: <RadioGrid options={question.options} />
   }
 
-  const editQuestion = (questionId) => {
+  const editQuestion = (questionKey) => {
+    const questionSelected = questions.find((item) => item.key === questionKey)
+
     setQuestionMode('edit')
-    setQuestionToEdit(questionId)
-    const questionSelected = questions.find((item) => item._id === questionId)
-    setQuestionSentence(questionSelected.pregunta)
-    if (questionSelected.opciones.length === 0) {
+    setQuestionToEdit(questionKey)
+    setQuestionSentence(questionSelected.sentence)
+    setQuestionType(questionSelected.type)
+    setOptions(questionSelected.options)
+    /* if (questionSelected.opciones.length === 0) {
       setQuestionType('open')
     } else {
       setQuestionType('options')
@@ -54,8 +58,8 @@ export default function QuestionPreview({ question, index }) {
         texto: item.texto
       }))
       setOptions(currentOptions)
-    }
-    setScroll(true)
+    } */
+    // setScroll(true)
   }
 
   const removeQuestion = (questionId) => {
@@ -96,7 +100,10 @@ export default function QuestionPreview({ question, index }) {
           <Paper sx={{ py: 1, px: 0, width: '65%' }}>
             <Grid container justifyContent="center">
               <Tooltip title="Editar pregunta" placement="right">
-                <IconButton aria-label="add-question" onClick={editQuestion}>
+                <IconButton
+                  aria-label="edit-question"
+                  onClick={() => editQuestion(question.key)}
+                >
                   <EditIcon sx={{ color: grey[700] }} />
                 </IconButton>
               </Tooltip>

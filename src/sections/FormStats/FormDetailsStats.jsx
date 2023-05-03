@@ -51,7 +51,7 @@ export default function FormDetailsStats({ form }) {
       await navigator.clipboard.writeText(formURL)
       setUrlCopied(true)
     } catch (err) {
-      console.log('NO COPIADO :(')
+      console.error('NO COPIADO :(')
     }
   } */
 

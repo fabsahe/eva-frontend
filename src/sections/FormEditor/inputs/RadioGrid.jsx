@@ -12,8 +12,8 @@ export default function RadioGrid() {
   const { rows, cols } = options
   const { setOptions } = useFormActions()
 
-  const handleChangeRow = (event, id) => {
-    const index = id
+  const handleChangeRow = (event, key) => {
+    const index = key
     const newRows = [...rows]
     newRows[index].value = event.target.value
     setOptions({ rows: newRows, cols })
@@ -22,15 +22,15 @@ export default function RadioGrid() {
   const handleAddRow = () => {
     const lastRow = rows.at(-1)
     const newRow = {
-      id: lastRow.id + 1,
-      value: `Fila ${lastRow.id + 2}`
+      key: lastRow.key + 1,
+      value: `Fila ${lastRow.key + 2}`
     }
     const newRows = [...rows, newRow]
     setOptions({ rows: newRows, cols })
   }
 
-  const handleChangeCol = (event, id) => {
-    const index = id
+  const handleChangeCol = (event, key) => {
+    const index = key
     const newCols = [...cols]
     newCols[index].value = event.target.value
     setOptions({ rows, cols: newCols })
@@ -39,8 +39,8 @@ export default function RadioGrid() {
   const handleAddCol = () => {
     const lastCol = cols.at(-1)
     const newCol = {
-      id: lastCol.id + 1,
-      value: `Columna ${lastCol.id + 2}`
+      key: lastCol.key + 1,
+      value: `Columna ${lastCol.key + 2}`
     }
     const newCols = [...cols, newCol]
     setOptions({ rows, cols: newCols })
@@ -56,12 +56,12 @@ export default function RadioGrid() {
         <Stack sx={{ width: '100%' }}>
           {rows.map((row) => (
             <TextField
-              key={row.id}
+              key={row.key}
               variant="outlined"
               placeholder="Texto de la opción"
               sx={{ mb: 1 }}
               value={row.value}
-              onChange={(event) => handleChangeRow(event, row.id)}
+              onChange={(event) => handleChangeRow(event, row.key)}
               onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
               autoComplete="off"
               hiddenLabel
@@ -88,12 +88,12 @@ export default function RadioGrid() {
         <Stack sx={{ width: '100%' }}>
           {cols.map((col) => (
             <TextField
-              key={col.id}
+              key={col.key}
               variant="outlined"
               placeholder="Texto de la opción"
               sx={{ mb: 1 }}
               value={col.value}
-              onChange={(event) => handleChangeCol(event, col.id)}
+              onChange={(event) => handleChangeCol(event, col.key)}
               onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
               autoComplete="off"
               hiddenLabel

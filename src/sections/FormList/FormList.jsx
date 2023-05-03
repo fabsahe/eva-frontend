@@ -55,7 +55,7 @@ export default function FormList() {
       setRows(rowsData)
       setLoading(false)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 

@@ -57,23 +57,24 @@ export default function QuestionEditor() {
 
   const newQuestion = () => {
     const prevQuestions = questions
-    const id = questions.length === 0 ? 0 : questions.at(-1).id + 1
+    const key = questions.length === 0 ? 0 : questions.at(-1).key + 1
     const newQuestions = [
       ...prevQuestions,
-      { id, sentence: questionSentence, type: questionType, options }
+      { key, sentence: questionSentence, type: questionType, options }
     ]
     setQuestions(newQuestions)
   }
 
   const updateQuestion = () => {
     const questionIndex = questions.findIndex(
-      (item) => item._id === questionToEdit
+      (question) => question.key === questionToEdit
     )
-    const newQuestionsUpdate = questions
-    newQuestionsUpdate[questionIndex].pregunta = questionSentence
-    newQuestionsUpdate[questionIndex].opciones = []
+    const updatedQuestions = [...questions]
+    updatedQuestions[questionIndex].sentence = questionSentence
+    updatedQuestions[questionIndex].type = questionType
+    updatedQuestions[questionIndex].options = options
 
-    setQuestions([...newQuestionsUpdate])
+    setQuestions(updatedQuestions)
   }
 
   const handleAddQuestion = () => {
@@ -148,7 +149,7 @@ export default function QuestionEditor() {
       <Grid item xs={12} md={1} lg={1} justifyContent="center">
         <Paper sx={{ py: 1, px: 0, width: '65%' }}>
           <Grid container justifyContent="center">
-            <Tooltip title="Agregar pregunta" placement="right">
+            <Tooltip title={editorTitle} placement="right">
               <IconButton aria-label="add-question" onClick={handleAddQuestion}>
                 <AddCircleOutlineIcon sx={{ color: grey[700] }} />
               </IconButton>

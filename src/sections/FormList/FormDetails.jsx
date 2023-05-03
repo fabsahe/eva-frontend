@@ -50,7 +50,7 @@ export default function FormDetails({ form }) {
       await navigator.clipboard.writeText(formURL)
       setUrlCopied(true)
     } catch (err) {
-      console.log('NO COPIADO :(')
+      console.error('NO COPIADO :(')
     }
   }
 
@@ -73,38 +73,38 @@ export default function FormDetails({ form }) {
             Título
           </Typography>
           <Typography variant="body1" component="div">
-            {form.titulo}
+            {form.title}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
             Periodo
           </Typography>
           <Typography variant="body1" component="div">
-            {form.año}-{form.periodo}
+            {form.year}-{form.period}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
             Fecha de aplicación
           </Typography>
           <Typography variant="body1" component="div">
-            {`Del ${dayjs(form.fechaInicio).format('DD-MM-YYYY')}
-                          al ${dayjs(form.fechaFin).format('DD-MM-YYYY')}`}
+            {`Del ${dayjs(form.startDate).format('DD-MM-YYYY')}
+                          al ${dayjs(form.endDate).format('DD-MM-YYYY')}`}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
             Creado por
           </Typography>
           <Typography variant="body1" component="div">
-            {form.usuario.name}
+            {form.user.name}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
             Carreras
           </Typography>
-          {form.carreras.map((carrera) => (
+          {form.careers.map((career) => (
             <Chip
-              key={carrera._id}
-              label={carrera.nombre}
+              key={career._id}
+              label={career.nombre}
               color="success"
               variant="outlined"
               sx={{ mt: 0.6, mr: 1 }}

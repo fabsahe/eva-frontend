@@ -50,10 +50,10 @@ const types = [
 const typeOptionsMap = {
   'open-ended': {},
   radios: {
-    radios: [{ id: 0, value: 'Opción 1' }]
+    radios: [{ key: 0, value: 'Opción 1' }]
   },
   checkboxes: {
-    checkboxes: [{ id: 0, value: 'Opción 1', checked: false }]
+    checkboxes: [{ key: 0, value: 'Opción 1', checked: false }]
   },
   scale: {
     scale: Array.from({ length: 10 }, (_, i) => ({
@@ -62,8 +62,8 @@ const typeOptionsMap = {
     labels: ['', '']
   },
   grid: {
-    rows: [{ id: 0, value: 'Fila 1' }],
-    cols: [{ id: 0, value: 'Columna 1' }]
+    rows: [{ key: 0, value: 'Fila 1' }],
+    cols: [{ key: 0, value: 'Columna 1' }]
   }
 }
 

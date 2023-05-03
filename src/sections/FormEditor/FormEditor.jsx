@@ -1,18 +1,11 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate, useParams } from 'react-router-dom'
-import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
-import Tooltip from '@mui/material/Tooltip'
-import IconButton from '@mui/material/IconButton'
-import RestoreIcon from '@mui/icons-material/Restore'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import { grey } from '@mui/material/colors'
 import axios from 'axios'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
@@ -105,7 +98,7 @@ export default function FormEditor({ mode }) {
       const sortedCareers = sortCareers(response.data.data)
       setCareerList(sortedCareers)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
@@ -114,7 +107,7 @@ export default function FormEditor({ mode }) {
       const response = await axios.get('http://localhost:3001/api/periods')
       setPeriodList(response.data.data)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
@@ -123,16 +116,16 @@ export default function FormEditor({ mode }) {
     if (response.status === 'OK') {
       const { data } = response
       const appendTitle = mode === 'clone' ? '(clon)' : ''
-      const newTitle = `${data.titulo} ${appendTitle}`
+      const newTitle = `${data.title} ${appendTitle}`
       setTitle(newTitle.trim())
-      setCareers(data.carreras.map((carrera) => carrera._id))
-      setYear(data.año)
-      setPeriod(data.periodo)
+      setCareers(data.careers.map((career) => career._id))
+      setYear(data.year)
+      setPeriod(data.period)
 
-      setStartDate(dayjs(data.fechaInicio))
-      setEndDate(dayjs(data.fechaFin))
+      setStartDate(dayjs(data.startDate))
+      setEndDate(dayjs(data.endDate))
 
-      setQuestions(data.preguntas)
+      setQuestions(data.questions)
 
       // obtener respuestas
       const answersResponse = await answerService.getAnswers(formId)
@@ -147,7 +140,7 @@ export default function FormEditor({ mode }) {
       const response = await formService.createNewForm(token, formData)
       if (response.status === 'OK') {
         noti('Cuestionario creado', NOTI_SUCCESS)
-        // navigate('/dashboard/cuestionarios')
+        navigate('/dashboard/cuestionarios')
       }
     } catch (error) {
       noti(error.mesage, NOTI_ERROR)
@@ -185,11 +178,6 @@ export default function FormEditor({ mode }) {
       noti('Las fechas son incorrectas', NOTI_ERROR)
       return
     }
-
-    /* const newQuestions = questions.map((item) => ({
-      pregunta: item.pregunta,
-      opciones: item.opciones.map((op) => ({ texto: op.texto }))
-    })) */
 
     const newForm = {
       title: title.trim(),
@@ -257,7 +245,7 @@ export default function FormEditor({ mode }) {
 
             {questions.map((question, index) => (
               <QuestionPreview
-                key={question.id}
+                key={question.key}
                 question={question}
                 index={index}
               />

@@ -51,7 +51,7 @@ export default function UsersList() {
       }))
       setRows(rowsData)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 

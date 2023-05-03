@@ -12,8 +12,8 @@ export default function Radios() {
   const { radios } = options
   const { setOptions } = useFormActions()
 
-  const handleChangeOption = (event, id) => {
-    const index = id
+  const handleChangeOption = (event, key) => {
+    const index = key
     const newRadios = [...radios]
     newRadios[index].value = event.target.value
     setOptions({ radios: newRadios })
@@ -22,8 +22,8 @@ export default function Radios() {
   const handleAddOption = () => {
     const lastRadio = radios.at(-1)
     const newRadio = {
-      id: lastRadio.id + 1,
-      value: `Opción ${lastRadio.id + 2}`
+      key: lastRadio.key + 1,
+      value: `Opción ${lastRadio.key + 2}`
     }
     const newRadios = [...radios, newRadio]
     setOptions({ radios: newRadios })
@@ -39,12 +39,12 @@ export default function Radios() {
         <Stack sx={{ width: '100%' }}>
           {radios.map((radio) => (
             <TextField
-              key={radio.id}
+              key={radio.key}
               variant="outlined"
               placeholder="Texto de la opción"
               sx={{ mb: 1 }}
               value={radio.value}
-              onChange={(event) => handleChangeOption(event, radio.id)}
+              onChange={(event) => handleChangeOption(event, radio.key)}
               onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
               autoComplete="off"
               hiddenLabel
@@ -57,7 +57,7 @@ export default function Radios() {
           startIcon={<AddCircleOutlineIcon />}
           onClick={handleAddOption}
           fullWidth
-          sx={{ mt: 1, mb: 1 }}
+          sx={{ mb: 1 }}
         >
           Agregar opción
         </Button>

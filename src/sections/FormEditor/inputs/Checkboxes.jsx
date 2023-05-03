@@ -12,8 +12,8 @@ export default function Checkboxes() {
   const { checkboxes } = options
   const { setOptions } = useFormActions()
 
-  const handleChangeOption = (event, id) => {
-    const index = id
+  const handleChangeOption = (event, key) => {
+    const index = key
     const newCheckboxes = [...checkboxes]
     newCheckboxes[index].value = event.target.value
     setOptions({ checkboxes: newCheckboxes })
@@ -22,8 +22,8 @@ export default function Checkboxes() {
   const handleAddOption = () => {
     const lastCheckbox = checkboxes.at(-1)
     const newCheckbox = {
-      id: lastCheckbox.id + 1,
-      value: `Opción ${lastCheckbox.id + 2}`
+      key: lastCheckbox.key + 1,
+      value: `Opción ${lastCheckbox.key + 2}`
     }
     const newCheckboxes = [...checkboxes, newCheckbox]
     setOptions({ checkboxes: newCheckboxes })
@@ -39,12 +39,12 @@ export default function Checkboxes() {
         <Stack sx={{ width: '100%' }}>
           {checkboxes.map((checkbox) => (
             <TextField
-              key={checkbox.id}
+              key={checkbox.key}
               variant="outlined"
               placeholder="Texto de la opción"
               sx={{ mb: 1 }}
               value={checkbox.value}
-              onChange={(event) => handleChangeOption(event, checkbox.id)}
+              onChange={(event) => handleChangeOption(event, checkbox.key)}
               onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
               autoComplete="off"
               hiddenLabel
@@ -57,7 +57,7 @@ export default function Checkboxes() {
           startIcon={<AddCircleOutlineIcon />}
           onClick={handleAddOption}
           fullWidth
-          sx={{ mt: 1, mb: 1 }}
+          sx={{ mb: 1 }}
         >
           Agregar opción
         </Button>

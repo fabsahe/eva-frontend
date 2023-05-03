@@ -74,7 +74,7 @@ export default function FormViewer() {
       }))
       setAnswers(emptyAnswers)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 

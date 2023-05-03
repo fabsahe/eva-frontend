@@ -25,7 +25,7 @@ export default function RadioGrid({ options }) {
           <TableRow sx={{ th: { border: 0 } }}>
             <TableCell />
             {cols.map((col) => (
-              <TableCell key={`c-${col.id}`} align="center" sx={{ pb: 0 }}>
+              <TableCell key={`c-${col.key}`} align="center" sx={{ pb: 0 }}>
                 {col.value}
               </TableCell>
             ))}
@@ -33,16 +33,16 @@ export default function RadioGrid({ options }) {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={`r-${row.id}`} sx={{ 'td, th': { border: 0 } }}>
+            <TableRow key={`r-${row.key}`} sx={{ 'td, th': { border: 0 } }}>
               <TableCell component="th" scope="row">
                 {row.value}
               </TableCell>
               {cols.map((col) => (
-                <TableCell key={`${row.id}-${col.id}`} align="center">
+                <TableCell key={`${row.key}-${col.key}`} align="center">
                   <Radio
-                    checked={selectedValue === `${row.id}-${col.id}`}
+                    checked={selectedValue === `${row.key}-${col.key}`}
                     onChange={handleChange}
-                    value={`${row.id}-${col.id}`}
+                    value={`${row.key}-${col.key}`}
                     name="radio-buttons"
                     inputProps={{ 'aria-label': 'A' }}
                   />

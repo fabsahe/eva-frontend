@@ -18,7 +18,7 @@ export default function Radios({ options }) {
       >
         {radios.map((radio) => (
           <FormControlLabel
-            key={radio.id}
+            key={radio.key}
             value={radio.value}
             control={<Radio />}
             label={radio.value}

@@ -21,12 +21,14 @@ export default function Checkboxes({ options }) {
       <FormGroup>
         {checkboxes.map((checkbox) => (
           <FormControlLabel
-            key={checkbox.id}
+            key={checkbox.key}
             value={checkbox.value}
             control={
               <Checkbox
                 checked={checkbox.checked}
-                onChange={(event) => handleChangeCheckboxes(event, checkbox.id)}
+                onChange={(event) =>
+                  handleChangeCheckboxes(event, checkbox.key)
+                }
                 name={checkbox.value}
               />
             }
