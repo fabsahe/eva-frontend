@@ -249,6 +249,7 @@ export default function FormEditor({ mode }) {
               />
             ))}
 
+            <div ref={bottomRef} style={{ scrollMargin: 80 }} />
             {emptyForm ? <QuestionEditor /> : null}
 
             <Button

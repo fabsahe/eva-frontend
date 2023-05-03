@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React from 'react'
 import IconButton from '@mui/material/IconButton'
@@ -49,22 +48,12 @@ export default function QuestionPreview({ question, index }) {
     setQuestionSentence(questionSelected.sentence)
     setQuestionType(questionSelected.type)
     setOptions(questionSelected.options)
-    /* if (questionSelected.opciones.length === 0) {
-      setQuestionType('open')
-    } else {
-      setQuestionType('options')
-      const currentOptions = questionSelected.opciones.map((item, k) => ({
-        _id: k + 1,
-        texto: item.texto
-      }))
-      setOptions(currentOptions)
-    } */
-    // setScroll(true)
+    setScroll(true)
   }
 
-  const removeQuestion = (questionId) => {
+  const removeQuestion = (questionKey) => {
     const questionSelected = questions.findIndex(
-      (item) => item._id === questionId
+      (item) => item.key === questionKey
     )
     const formStr = JSON.stringify(questions)
     const updatedForm = JSON.parse(formStr)
@@ -109,7 +98,10 @@ export default function QuestionPreview({ question, index }) {
               </Tooltip>
 
               <Tooltip title="Eliminar pregunta" placement="right">
-                <IconButton aria-label="undo" onClick={removeQuestion}>
+                <IconButton
+                  aria-label="undo"
+                  onClick={() => removeQuestion(question.key)}
+                >
                   <DeleteIcon sx={{ color: grey[700] }} />
                 </IconButton>
               </Tooltip>
