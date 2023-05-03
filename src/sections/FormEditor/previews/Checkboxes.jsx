@@ -7,7 +7,7 @@ import FormGroup from '@mui/material/FormGroup'
 import Checkbox from '@mui/material/Checkbox'
 
 export default function Checkboxes({ options }) {
-  const [checkboxes, setCheckboxes] = useState(options.checkboxes)
+  const [checkboxes, setCheckboxes] = useState([...options.checkboxes])
 
   const handleChangeCheckboxes = (event, id) => {
     const newCheckboxes = [...checkboxes]

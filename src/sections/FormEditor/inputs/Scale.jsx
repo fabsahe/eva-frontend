@@ -9,14 +9,15 @@ import Slider from '@mui/material/Slider'
 import { useOptions, useFormActions } from '../../../store/formStore'
 
 export default function Scale() {
-  const [step, setStep] = useState(10)
-  const [sliderValue, setSliderValue] = useState(10)
-  const [label1, setLabel1] = useState('')
-  const [label2, setLabel2] = useState('')
-
   const options = useOptions()
-  const { scale } = options
+  const { scale, labels } = options
   const { setOptions } = useFormActions()
+  const initial = scale[1].value - scale[0].value
+
+  const [step, setStep] = useState(initial)
+  const [sliderValue, setSliderValue] = useState(initial)
+  const [label1, setLabel1] = useState(labels[0])
+  const [label2, setLabel2] = useState(labels[1])
 
   const setSlider = (increment) => {
     const length = 100 / increment
@@ -28,7 +29,7 @@ export default function Scale() {
     setOptions({ scale: newScale, labels: [label1, label2] })
   }
 
-  const handleChangeInterval = (event) => {
+  const handleChangeIncrement = (event) => {
     const increment = event.target.value
     setSlider(increment)
   }
@@ -68,7 +69,7 @@ export default function Scale() {
             id="demo-simple-select"
             value={step}
             label="Pasos"
-            onChange={handleChangeInterval}
+            onChange={handleChangeIncrement}
           >
             <MenuItem value={10}>De 10 en 10</MenuItem>
             <MenuItem value={20}>De 20 en 20</MenuItem>

@@ -23,7 +23,8 @@ export default function Checkboxes() {
     const lastCheckbox = checkboxes.at(-1)
     const newCheckbox = {
       key: lastCheckbox.key + 1,
-      value: `Opción ${lastCheckbox.key + 2}`
+      value: `Opción ${lastCheckbox.key + 2}`,
+      checked: false
     }
     const newCheckboxes = [...checkboxes, newCheckbox]
     setOptions({ checkboxes: newCheckboxes })

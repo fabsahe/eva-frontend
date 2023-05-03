@@ -11,7 +11,7 @@ import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
 import formService from '../../services/formService'
-import answerService from '../../services/answerService'
+// import answerService from '../../services/answerService'
 import Identification from './Identification'
 import Configuration from './Configuration'
 import QuestionPreview from './QuestionPreview'
@@ -127,10 +127,8 @@ export default function FormEditor({ mode }) {
 
       setQuestions(data.questions)
 
-      // obtener respuestas
-      const answersResponse = await answerService.getAnswers(formId)
       if (mode === 'edit') {
-        setEmptyForm(answersResponse.data.length === 0)
+        setEmptyForm(data.answersNumber === 0)
       }
     }
   }
