@@ -2,58 +2,37 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Toolbar from '@mui/material/Toolbar'
-import AppBar from '@mui/material/AppBar'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
 import Container from '@mui/material/Container'
-import Button from '@mui/material/Button'
-import Stepper from '@mui/material/Stepper'
-import Step from '@mui/material/Step'
-import StepLabel from '@mui/material/StepLabel'
-import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import TextField from '@mui/material/TextField'
-import Radio from '@mui/material/Radio'
-import RadioGroup from '@mui/material/RadioGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import FormLabel from '@mui/material/FormLabel'
 import axios from 'axios'
-import { useSnackbar } from 'notistack'
+// import { useSnackbar } from 'notistack'
 import Loader from '../../common/Loader'
-import Logo from '../../assets/images/utm-header.jpg'
-import { NOTI_ERROR } from '../../constants/notiConstants'
-import answerService from '../../services/answerService'
+import FormBar from './FormBar'
+import FormStepper from './FormStepper'
+import FormQuestions from './FormQuestions'
+// import { NOTI_ERROR } from '../../constants/notiConstants'
+// import answerService from '../../services/answerService'
+import { useSection, useFormViewerActions } from '../../store/formViewerStore'
 
-const steps = [
-  'Seleccionar carrera',
-  'Selecionar grupo',
-  'Seleccionar profesor'
-]
+const sectionMap = {
+  stepper: <FormStepper />,
+  questions: <FormQuestions />,
+  finished: <p>Adiós</p>
+}
 
 export default function FormViewer() {
   const [title, setTitle] = useState('')
-  const [year, setYear] = useState('')
-  const [period, setPeriod] = useState('')
-  const [careers, setCareers] = useState([])
-  const [career, setCareer] = useState('')
-  const [questions, setQuestions] = useState([])
-  const [groups, setGroups] = useState([])
-  const [group, setGroup] = useState('')
-  const [professors, setProfessors] = useState([])
-  const [professor, setProfessor] = useState('')
   const [visible, setVisible] = useState(null)
-  const [activeStep, setActiveStep] = useState(0)
-  const [showForm, setShowForm] = useState(false)
-  const [answers, setAnswers] = useState([])
-  const [finished, setFinished] = useState(false)
+  // const [answers, setAnswers] = useState([])
+  // const [finished, setFinished] = useState(false)
   const [loading, setLoading] = useState(true)
 
   const params = useParams()
   const { formId } = params
-  const { enqueueSnackbar: noti } = useSnackbar()
+  // const { enqueueSnackbar: noti } = useSnackbar()
+
+  const section = useSection()
+  const { setSection, setCareers, setYear, setPeriod, setQuestions } =
+    useFormViewerActions()
 
   const getForm = async () => {
     try {
@@ -61,111 +40,25 @@ export default function FormViewer() {
         `http://localhost:3001/api/forms/${formId}`
       )
       const { data } = response.data
-      setTitle(data.titulo)
-      setYear(data['año'])
-      setPeriod(data.periodo)
-      setCareers(data.carreras)
-      setQuestions(data.preguntas)
+      setTitle(data.title)
+      setCareers(data.careers)
+      setYear(data.year)
+      setPeriod(data.period)
+      setQuestions(data.questions)
       setVisible(data.visible)
+      setSection('stepper')
 
-      const emptyAnswers = data.preguntas.map((item) => ({
-        pregunta: item._id,
-        respuesta: ''
+      /* const emptyAnswers = data.questions.map((item) => ({
+        question: item._id,
+        answer: ''
       }))
-      setAnswers(emptyAnswers)
+      setAnswers(emptyAnswers) */
     } catch (err) {
       console.error(err)
     }
   }
 
-  const getNumberByTokens = (tokens) => {
-    const a = parseInt(tokens[0], 10) * 10
-    const b = tokens[1].charCodeAt(0) - 97
-    return a + b
-  }
-
-  const handleChangeCareer = async (event) => {
-    const careerId = event.target.value
-    setCareer(careerId)
-    const assignments = await axios.get(
-      `http://localhost:3001/api/assignments/${careerId}?year=${year}&period=${period}`
-    )
-    const allGroups = assignments.data.data.map(
-      (assignment) => assignment.grupo
-    )
-    // eliminar repetidos
-    const currentGroups = allGroups.filter(
-      (item, index) => allGroups.indexOf(item) === index
-    )
-    // Sub-arreglo de los que tienen la forma 'NUMERO-LETRA'
-    const subArray1 = currentGroups.filter((item) =>
-      /^\d+-[A-Za-z]$/.test(item)
-    )
-    // Sub-arreglo de los que empiezan con 'P'
-    const subArray2 = currentGroups.filter((item) => item.startsWith('P'))
-    // Sub-arreglo de los que empiezan con 'M' o 'D'
-    const subArray3 = currentGroups.filter(
-      (item) => item.startsWith('M') || item.startsWith('D')
-    )
-    // ordenar grupos
-    subArray1.sort((a, b) => {
-      const aTokens = a.split('-')
-      const bTokens = b.split('-')
-      const aNum = getNumberByTokens(aTokens)
-      const bNum = getNumberByTokens(bTokens)
-      return aNum - bNum
-    })
-    const sortedGroups = [...subArray1, ...subArray2, ...subArray3]
-    setGroups(sortedGroups)
-  }
-
-  const handleChangeGroup = async (event) => {
-    const groupName = event.target.value
-    setGroup(groupName)
-    const professorsResponse = await axios.get(
-      `http://localhost:3001/api/assignments/professors/${groupName}?year=${year}&period=${period}`
-    )
-    setProfessors(professorsResponse.data.data)
-  }
-
-  const handleChangeProfessor = (event) => {
-    setProfessor(event.target.value)
-  }
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
-  }
-
-  const handleNextGroups = () => {
-    setActiveStep(1)
-  }
-
-  const handleNextProfessors = () => {
-    setActiveStep(2)
-  }
-
-  const handleStart = () => {
-    setShowForm(true)
-  }
-
-  const handleChangeAnswer = (event) => {
-    let questionId = ''
-    if (event.target.type === 'text') {
-      questionId = event.target.id
-    }
-    if (event.target.type === 'radio') {
-      questionId = event.target.name
-    }
-    const newAnswers = answers.map((item) => {
-      if (item.pregunta === questionId) {
-        return { pregunta: item.pregunta, respuesta: event.target.value }
-      }
-      return item
-    })
-    setAnswers(newAnswers)
-  }
-
-  const handleSubmit = async () => {
+  /* const handleSubmit = async () => {
     const newAnsweredForm = {
       cuestionario: formId,
       carrera: career,
@@ -181,7 +74,7 @@ export default function FormViewer() {
     } catch (error) {
       noti(error.mesage, NOTI_ERROR)
     }
-  }
+  } */
 
   useEffect(() => {
     async function fetchData() {
@@ -194,33 +87,7 @@ export default function FormViewer() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
-        position="absolute"
-        sx={{
-          backgroundColor: '#ffffff',
-          borderBottom: 1,
-          borderColor: '#d4d4d4'
-        }}
-        elevation={0}
-      >
-        <Toolbar
-          sx={{
-            pr: '24px' // keep right padding when drawer closed
-          }}
-        >
-          <img
-            src={Logo}
-            alt="Logo"
-            width="55"
-            style={{
-              marginTop: 7,
-              marginLeft: -8,
-              display: { xs: 'none', md: 'flex' },
-              flexGrow: 0
-            }}
-          />
-        </Toolbar>
-      </AppBar>
+      <FormBar />
 
       {loading ? (
         <Box component="main" sx={{ flexGrow: 1, mt: 9 }}>
@@ -231,232 +98,23 @@ export default function FormViewer() {
           component="main"
           sx={{
             flexGrow: 1,
-            height: finished ? '80vh' : '100vh',
-            overflow: 'auto'
+            minHeight: '80vh'
           }}
         >
-          {visible && !showForm && !finished ? (
-            <Container maxWidth="sm" sx={{ mt: 9 }}>
-              <Typography component="h1" variant="h4">
-                {visible ? title : 'El cuestionario no se encuentra activo'}
-              </Typography>
-              <Box sx={{ mb: 2 }} />
-
-              <Stepper activeStep={activeStep}>
-                {steps.map((label) => {
-                  const stepProps = {}
-                  const labelProps = {}
-                  return (
-                    <Step key={label} {...stepProps}>
-                      <StepLabel {...labelProps}>{label}</StepLabel>
-                    </Step>
-                  )
-                })}
-              </Stepper>
-              <Box sx={{ mb: 2 }} />
-
-              {activeStep === 0 && (
-                <>
-                  <FormControl fullWidth>
-                    <InputLabel id="career-select-label">Carrera</InputLabel>
-                    <Select
-                      labelId="career-select-label"
-                      id="carer-form-select"
-                      value={career}
-                      label="Carrera"
-                      onChange={handleChangeCareer}
-                      required
-                    >
-                      {careers.map((careerItem) => (
-                        <MenuItem key={careerItem._id} value={careerItem._id}>
-                          {careerItem.nombre}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                    <Box sx={{ flex: '1 1 auto' }} />
-                    <Button onClick={handleNextGroups}>Continuar</Button>
-                  </Box>
-                </>
-              )}
-
-              {activeStep === 1 && (
-                <>
-                  <FormControl fullWidth>
-                    <InputLabel id="group-select-label">Grupo</InputLabel>
-                    <Select
-                      labelId="group-select-label"
-                      id="group-form-select"
-                      value={group}
-                      label="Grupo"
-                      onChange={handleChangeGroup}
-                      required
-                    >
-                      {groups.map((groupItem) => (
-                        <MenuItem key={groupItem} value={groupItem}>
-                          {groupItem}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                    <Button
-                      color="inherit"
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      sx={{ mr: 1 }}
-                    >
-                      Regresar
-                    </Button>
-                    <Box sx={{ flex: '1 1 auto' }} />
-                    <Button onClick={handleNextProfessors}>Continuar</Button>
-                  </Box>
-                </>
-              )}
-
-              {activeStep === 2 && (
-                <>
-                  <FormControl fullWidth>
-                    <InputLabel id="professor-select-label">
-                      Profesor
-                    </InputLabel>
-                    <Select
-                      labelId="professor-select-label"
-                      id="professor-form-select"
-                      value={professor}
-                      label="Grupo"
-                      onChange={handleChangeProfessor}
-                      required
-                    >
-                      {professors &&
-                        professors.map((professorItem) => (
-                          <MenuItem
-                            key={professorItem.profesor._id}
-                            value={professorItem.profesor._id}
-                          >
-                            {`${professorItem.profesor.nombre} - ${professorItem.materia.nombre}`}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                  </FormControl>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                    <Button
-                      color="inherit"
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      sx={{ mr: 1 }}
-                    >
-                      Regresar
-                    </Button>
-                    <Box sx={{ flex: '1 1 auto' }} />
-                    <Button onClick={handleStart}>Continuar</Button>
-                  </Box>
-                </>
-              )}
-            </Container>
-          ) : null}
-
-          {visible && showForm && !finished ? (
+          {visible ? (
             <Container maxWidth="md" sx={{ mt: 9 }}>
-              <Typography component="h1" variant="h4">
-                {visible ? title : 'El cuestionario no se encuentra activo'}
-              </Typography>
-              <Box sx={{ mb: 2 }} />
-
-              <Grid container spacing={2}>
-                {questions &&
-                  questions.map((item, index) => (
-                    <Grid item key={item._id} md={12} lg={12}>
-                      <Paper
-                        sx={{
-                          p: 2,
-                          display: 'flex',
-                          flexDirection: 'column'
-                        }}
-                        variant="outlined"
-                      >
-                        <Grid container>
-                          <Grid item md={9}>
-                            <Typography
-                              variant="h6"
-                              component="div"
-                              sx={{ mb: 1 }}
-                            >
-                              {`${index + 1} - ${item.pregunta}`}
-                            </Typography>
-                          </Grid>
-                          <Grid item md={3} />
-                        </Grid>
-
-                        {item.opciones && item.opciones.length === 0 ? (
-                          <TextField
-                            id={item._id}
-                            fullWidth
-                            hiddenLabel
-                            variant="outlined"
-                            sx={{ mb: 1 }}
-                            placeholder="Respuesta"
-                            onBlur={(e) => handleChangeAnswer(e)}
-                          />
-                        ) : (
-                          <FormControl>
-                            <FormLabel id="demo-radio-buttons-group-label">
-                              Respuestas
-                            </FormLabel>
-                            <RadioGroup
-                              aria-labelledby="demo-radio-buttons-group-label"
-                              name={item._id}
-                              onChange={(e) => handleChangeAnswer(e)}
-                            >
-                              {item.opciones.map((opcion) => (
-                                <FormControlLabel
-                                  key={opcion._id}
-                                  value={opcion.texto}
-                                  control={<Radio />}
-                                  label={opcion.texto}
-                                />
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                        )}
-                      </Paper>
-                    </Grid>
-                  ))}
-              </Grid>
-
-              <Box
-                sx={{ my: 4 }}
-                display="flex"
-                justifyContent="flex-end"
-                alignItems="flex-end"
-              >
-                <Button variant="contained" onClick={handleSubmit}>
-                  Enviar
-                </Button>
-              </Box>
-            </Container>
-          ) : null}
-
-          {finished ? (
-            <Container maxWidth="md" sx={{ mt: 9 }}>
-              <Typography component="h1" variant="h4">
+              <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
                 {title}
               </Typography>
-
-              <Typography component="h1" variant="h5">
-                Las respuestas se han enviado
-              </Typography>
+              {sectionMap[section] ?? null}
             </Container>
-          ) : null}
-
-          {!visible ? (
-            <Container maxWidth="sm" sx={{ mt: 9 }}>
+          ) : (
+            <Container maxWidth="md" sx={{ mt: 9 }}>
               <Typography component="h1" variant="h4">
-                {visible ? title : 'El cuestionario no se encuentra activo'}
+                El cuestionario no se encuentra activo
               </Typography>
             </Container>
-          ) : null}
+          )}
         </Box>
       )}
     </Box>
