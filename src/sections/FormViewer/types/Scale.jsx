@@ -4,13 +4,39 @@ import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
 import Typography from '@mui/material/Typography'
+import {
+  useAnswers,
+  useFormViewerActions
+} from '../../../store/formViewerStore'
 
-export default function Scale({ options }) {
+export default function Scale({ questionId, options }) {
   const { scale, labels } = options
   const [sliderValue, setSliderValue] = useState(scale[0].value)
 
+  const answers = useAnswers()
+  const { setAnswers } = useFormViewerActions()
+
+  const getString = (value) => {
+    const step = scale[1].value - scale[0].value
+    const firstValue = value - step + (value === step ? 0 : 1)
+    return `De ${firstValue}% a ${value}%`
+  }
+
+  const handleChangeAnswer = (value) => {
+    const newAnswers = answers.map((answer) => {
+      if (answer.question === questionId) {
+        return { question: answer.question, answers: [value] }
+      }
+      return answer
+    })
+
+    setAnswers(newAnswers)
+  }
+
   const handleChangeSlider = (_, newValue) => {
     setSliderValue(newValue)
+
+    handleChangeAnswer(getString(newValue))
   }
 
   const valuetext = (value) => {
@@ -18,9 +44,7 @@ export default function Scale({ options }) {
   }
 
   const valueLabelFormat = (value) => {
-    const step = scale[1].value - scale[0].value
-    const firstValue = value - step + (value === step ? 0 : 1)
-    return `De ${firstValue}% a ${value}%`
+    return getString(value)
   }
 
   useEffect(() => {

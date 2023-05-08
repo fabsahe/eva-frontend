@@ -4,35 +4,39 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import axios from 'axios'
-// import { useSnackbar } from 'notistack'
 import Loader from '../../common/Loader'
 import FormBar from './FormBar'
 import FormStepper from './FormStepper'
 import FormQuestions from './FormQuestions'
-// import { NOTI_ERROR } from '../../constants/notiConstants'
-// import answerService from '../../services/answerService'
 import { useSection, useFormViewerActions } from '../../store/formViewerStore'
 
 const sectionMap = {
   stepper: <FormStepper />,
   questions: <FormQuestions />,
-  finished: <p>Adiós</p>
+  finished: (
+    <Typography component="h1" variant="h4">
+      Las respuestas se han enviado
+    </Typography>
+  )
 }
 
 export default function FormViewer() {
   const [title, setTitle] = useState('')
   const [visible, setVisible] = useState(null)
-  // const [answers, setAnswers] = useState([])
-  // const [finished, setFinished] = useState(false)
   const [loading, setLoading] = useState(true)
 
   const params = useParams()
   const { formId } = params
-  // const { enqueueSnackbar: noti } = useSnackbar()
 
   const section = useSection()
-  const { setSection, setCareers, setYear, setPeriod, setQuestions } =
-    useFormViewerActions()
+  const {
+    setSection,
+    setCareers,
+    setYear,
+    setPeriod,
+    setQuestions,
+    setAnswers
+  } = useFormViewerActions()
 
   const getForm = async () => {
     try {
@@ -48,33 +52,15 @@ export default function FormViewer() {
       setVisible(data.visible)
       setSection('stepper')
 
-      /* const emptyAnswers = data.questions.map((item) => ({
+      const emptyAnswers = data.questions.map((item) => ({
         question: item._id,
-        answer: ''
+        answers: []
       }))
-      setAnswers(emptyAnswers) */
+      setAnswers(emptyAnswers)
     } catch (err) {
       console.error(err)
     }
   }
-
-  /* const handleSubmit = async () => {
-    const newAnsweredForm = {
-      cuestionario: formId,
-      carrera: career,
-      grupo: group,
-      profesor: professor,
-      respuestas: answers
-    }
-    try {
-      const response = await answerService.createNewAnswer(newAnsweredForm)
-      if (response.data.status === 'OK') {
-        setFinished(true)
-      }
-    } catch (error) {
-      noti(error.mesage, NOTI_ERROR)
-    }
-  } */
 
   useEffect(() => {
     async function fetchData() {

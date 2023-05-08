@@ -14,6 +14,9 @@ import {
   useCareers,
   useYear,
   usePeriod,
+  useCareer,
+  useGroup,
+  useProfessor,
   useFormViewerActions
 } from '../../store/formViewerStore'
 
@@ -24,17 +27,18 @@ const steps = [
 ]
 
 export default function FormStepper() {
-  const [career, setCareer] = useState('')
   const [groups, setGroups] = useState([])
-  const [group, setGroup] = useState('')
   const [professors, setProfessors] = useState([])
-  const [professor, setProfessor] = useState('')
   const [activeStep, setActiveStep] = useState(0)
 
   const careers = useCareers()
   const year = useYear()
   const period = usePeriod()
-  const { setSection } = useFormViewerActions()
+  const career = useCareer()
+  const group = useGroup()
+  const professor = useProfessor()
+  const { setSection, setCareer, setGroup, setProfessor } =
+    useFormViewerActions()
 
   const getNumberByTokens = (tokens) => {
     const a = parseInt(tokens[0], 10) * 10

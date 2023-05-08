@@ -8,9 +8,9 @@ const getAnswers = async (formId) => {
   return data
 }
 
-const createNewAnswer = async (answers) => {
+const createNewAnswers = async (answers) => {
   const response = await axios.post(baseURL, answers)
   return response
 }
 
-export default { getAnswers, createNewAnswer }
+export default { getAnswers, createNewAnswers }

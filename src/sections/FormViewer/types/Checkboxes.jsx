@@ -5,14 +5,37 @@ import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import FormGroup from '@mui/material/FormGroup'
 import Checkbox from '@mui/material/Checkbox'
+import {
+  useAnswers,
+  useFormViewerActions
+} from '../../../store/formViewerStore'
 
-export default function Checkboxes({ options }) {
+export default function Checkboxes({ questionId, options }) {
   const [checkboxes, setCheckboxes] = useState([...options.checkboxes])
+
+  const answers = useAnswers()
+  const { setAnswers } = useFormViewerActions()
+
+  const handleChangeAnswer = (answerList) => {
+    const newAnswers = answers.map((answer) => {
+      if (answer.question === questionId) {
+        return { question: answer.question, answers: [...answerList] }
+      }
+      return answer
+    })
+
+    setAnswers(newAnswers)
+  }
 
   const handleChangeCheckboxes = (event, id) => {
     const newCheckboxes = [...checkboxes]
     newCheckboxes[id].checked = event.target.checked
     setCheckboxes(newCheckboxes)
+
+    const answerList = newCheckboxes
+      .filter((obj) => obj.checked)
+      .map((obj) => obj.value)
+    handleChangeAnswer(answerList)
   }
 
   useEffect(() => {
