@@ -48,7 +48,7 @@ export default function Identification({ mode, careerList, periodList }) {
   const editorTitle = titleList[mode] || ''
   const careerEntries = careerList.map((career) => [career._id, career.nombre])
   const careerNames = Object.fromEntries(careerEntries)
-  const yearOptions = periodList.map((item) => item.año)
+  const yearOptions = periodList.map((item) => item.año).reverse()
   const periodOptions = periodList.find((item) => item.año === year)
 
   const handleChangeTitle = (event) => {

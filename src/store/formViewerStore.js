@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 const useFormViewerStore = create((set) => ({
+  formId: '',
   section: '',
   careers: [],
   year: '',
@@ -11,6 +12,7 @@ const useFormViewerStore = create((set) => ({
   questions: [],
   answers: [],
   actions: {
+    setFormId: (value) => set({ formId: value }),
     setSection: (value) => set({ section: value }),
     setCareers: (value) => set({ careers: value }),
     setYear: (value) => set({ year: value }),
@@ -23,6 +25,7 @@ const useFormViewerStore = create((set) => ({
   }
 }))
 
+export const useFormId = () => useFormViewerStore((state) => state.formId)
 export const useSection = () => useFormViewerStore((state) => state.section)
 export const useCareers = () => useFormViewerStore((state) => state.careers)
 export const useYear = () => useFormViewerStore((state) => state.year)

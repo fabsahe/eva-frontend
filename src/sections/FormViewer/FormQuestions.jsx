@@ -14,6 +14,7 @@ import RadioGrid from './types/RadioGrid'
 import { NOTI_ERROR } from '../../constants/notiConstants'
 import answerService from '../../services/answerService'
 import {
+  useFormId,
   useCareer,
   useGroup,
   useProfessor,
@@ -23,11 +24,13 @@ import {
 } from '../../store/formViewerStore'
 
 export default function FormViewer() {
-  const questions = useQuestions()
-  const answers = useAnswers()
+  const formId = useFormId()
   const career = useCareer()
   const group = useGroup()
   const professor = useProfessor()
+  const questions = useQuestions()
+  const answers = useAnswers()
+
   const { setSection } = useFormViewerActions()
 
   const { enqueueSnackbar: noti } = useSnackbar()
@@ -53,7 +56,7 @@ export default function FormViewer() {
       answers: answer.answers
     }))
     try {
-      const response = await answerService.createNewAnswers(newAnswers)
+      const response = await answerService.createNewAnswers(formId, newAnswers)
       if (response.data.status === 'OK') {
         setSection('finished')
       }

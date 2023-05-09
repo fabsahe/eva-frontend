@@ -8,8 +8,8 @@ const getAnswers = async (formId) => {
   return data
 }
 
-const createNewAnswers = async (answers) => {
-  const response = await axios.post(baseURL, answers)
+const createNewAnswers = async (formId, answers) => {
+  const response = await axios.post(baseURL, { formId, answers })
   return response
 }
 

@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
-import axios from 'axios'
 import Loader from '../../common/Loader'
 import FormBar from './FormBar'
 import FormStepper from './FormStepper'
 import FormQuestions from './FormQuestions'
+import formService from '../../services/formService'
 import { useSection, useFormViewerActions } from '../../store/formViewerStore'
 
 const sectionMap = {
@@ -30,6 +30,7 @@ export default function FormViewer() {
 
   const section = useSection()
   const {
+    setFormId,
     setSection,
     setCareers,
     setYear,
@@ -40,10 +41,8 @@ export default function FormViewer() {
 
   const getForm = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/forms/${formId}`
-      )
-      const { data } = response.data
+      const response = await formService.getOneForm(formId)
+      const { data } = response
       setTitle(data.title)
       setCareers(data.careers)
       setYear(data.year)
@@ -68,6 +67,7 @@ export default function FormViewer() {
       await getForm()
       setLoading(false)
     }
+    setFormId(formId)
     fetchData()
   }, [])
 
