@@ -77,7 +77,11 @@ export default function FormViewer() {
             }}
             variant="outlined"
           >
-            <Typography variant="h6" component="div" sx={{ mb: 1 }}>
+            <Typography
+              variant="subtitle1"
+              component="h1"
+              sx={{ mb: 0.7, fontWeight: 500, fontSize: 18 }}
+            >
               {`${index + 1}.- ${question.sentence}`}
             </Typography>
 

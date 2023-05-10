@@ -5,6 +5,18 @@ import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
 import Typography from '@mui/material/Typography'
 
+function ScaleLabel({ label }) {
+  return (
+    <Typography
+      variant="body1"
+      component="div"
+      sx={{ fontSize: 15, textAlign: 'center' }}
+    >
+      {label}
+    </Typography>
+  )
+}
+
 export default function Scale({ options }) {
   const { scale, labels } = options
   const [sliderValue, setSliderValue] = useState(scale[0].value)
@@ -30,9 +42,7 @@ export default function Scale({ options }) {
     <Grid container>
       <Grid item md={2} lg={2}>
         <Box display="flex" justifyContent="center" sx={{ pt: 3 }}>
-          <Typography variant="body1" component="div">
-            {labels[0]}
-          </Typography>
+          <ScaleLabel label={labels[0]} />
         </Box>
       </Grid>
       <Grid item md={8} lg={8}>
@@ -50,9 +60,7 @@ export default function Scale({ options }) {
       </Grid>
       <Grid item md={2} lg={2}>
         <Box display="flex" justifyContent="center" sx={{ pt: 3 }}>
-          <Typography variant="body1" component="div">
-            {labels[1]}
-          </Typography>
+          <ScaleLabel label={labels[1]} />
         </Box>
       </Grid>
     </Grid>
