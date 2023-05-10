@@ -165,6 +165,7 @@ export default function FormStats() {
         filterList,
         filter
       }
+
       const docDefinition = createDocument(
         infoPDF,
         questions,

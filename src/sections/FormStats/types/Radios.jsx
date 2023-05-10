@@ -7,6 +7,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
 import randomColor from 'randomcolor'
 import { useDownload, useChartActions } from '../../../store/chartStore'
+import pieOptions from '../../../constants/pieOptions'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -19,17 +20,6 @@ const plugin = {
     ctx.fillStyle = options.color || '#99ffff'
     ctx.fillRect(0, 0, chart.width, chart.height)
     ctx.restore()
-  }
-}
-
-const options = {
-  plugins: {
-    legend: {
-      position: 'top'
-    },
-    customCanvasBackgroundColor: {
-      color: 'white'
-    }
   }
 }
 
@@ -90,7 +80,7 @@ export default function Radios({ answers, index, filter }) {
           <Pie
             ref={chartRef}
             data={data}
-            options={options}
+            options={pieOptions}
             plugins={[plugin]}
           />
         </Box>

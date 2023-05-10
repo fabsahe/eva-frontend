@@ -8,6 +8,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
 import randomColor from 'randomcolor'
 import { useDownload, useChartActions } from '../../../store/chartStore'
+import pieOptions from '../../../constants/pieOptions'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -23,24 +24,13 @@ const plugin = {
   }
 }
 
-const options = {
-  plugins: {
-    legend: {
-      position: 'top'
-    },
-    customCanvasBackgroundColor: {
-      color: 'white'
-    }
-  }
-}
-
 const generateRandomColors = (count) => {
   return randomColor({
     count
   })
 }
 
-function SubQuestion({ sentence, subAnswers, filter }) {
+function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -76,11 +66,11 @@ function SubQuestion({ sentence, subAnswers, filter }) {
     return str
   }
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (download) {
-      addImage({ index, data: getBase64Image() })
+      addImage({ index, subIndex, data: getBase64Image() })
     }
-  }, [download]) */
+  }, [download])
 
   return (
     <Grid item xs={12} md={6} lg={6}>
@@ -88,7 +78,12 @@ function SubQuestion({ sentence, subAnswers, filter }) {
         {sentence}
       </Typography>
       <Box sx={{ pt: 0, px: 4, mb: 1 }}>
-        <Pie ref={chartRef} data={data} options={options} plugins={[plugin]} />
+        <Pie
+          ref={chartRef}
+          data={data}
+          options={pieOptions}
+          plugins={[plugin]}
+        />
       </Box>
     </Grid>
   )
@@ -99,11 +94,13 @@ export default function RadioGrid({ answers, index, filter, subQuestions }) {
 
   return (
     <Grid container spacing={3}>
-      {subQuestions.map((item, subindex) => (
+      {subQuestions.map((item, subIndex) => (
         <SubQuestion
           key={item.id}
           sentence={item.value}
-          subAnswers={groupedAnswers[subindex]}
+          subAnswers={groupedAnswers[subIndex]}
+          index={index}
+          subIndex={subIndex}
           filter={filter}
         />
       ))}
