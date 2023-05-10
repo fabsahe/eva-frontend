@@ -93,12 +93,7 @@ export default function FormViewer() {
           justifyContent="flex-end"
           alignItems="flex-end"
         >
-          <Button
-            variant="contained"
-            color="avocado"
-            size="large"
-            onClick={handleSubmit}
-          >
+          <Button variant="contained" color="avocado" onClick={handleSubmit}>
             Enviar respuestas
           </Button>
         </Box>

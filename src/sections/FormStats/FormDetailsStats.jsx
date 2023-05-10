@@ -6,7 +6,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-// import LinkIcon from '@mui/icons-material/Link'
 import RateReviewIcon from '@mui/icons-material/RateReview'
 import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
@@ -39,21 +38,10 @@ export default function FormDetailsStats({ form }) {
   const modalDetails = useModalDetails()
   const { hideModalDetails } = useFormActions()
 
-  // const formURL = `http://localhost:5173/cuestionarios/${form._id}`
-
   const handleClose = () => {
     hideModalDetails()
     setOpen(false)
   }
-
-  /* const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(formURL)
-      setUrlCopied(true)
-    } catch (err) {
-      console.error('NO COPIADO :(')
-    }
-  } */
 
   const handleCloseSnackbar = () => {
     setUrlCopied(false)
@@ -74,14 +62,14 @@ export default function FormDetailsStats({ form }) {
             Título
           </Typography>
           <Typography variant="body1" component="div">
-            {form.titulo}
+            {form.title}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
             Periodo
           </Typography>
           <Typography variant="body1" component="div">
-            {form.año}-{form.periodo}
+            {form.year}-{form.period}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
@@ -96,16 +84,16 @@ export default function FormDetailsStats({ form }) {
             Creado por
           </Typography>
           <Typography variant="body1" component="div">
-            {form.usuario.name}
+            {form.user.name}
           </Typography>
 
           <Typography variant="h6" component="div" sx={styles.header2}>
             Carreras
           </Typography>
-          {form.carreras.map((carrera) => (
+          {form.careers.map((career) => (
             <Chip
-              key={carrera._id}
-              label={carrera.nombre}
+              key={career._id}
+              label={career.nombre}
               color="success"
               variant="outlined"
               sx={{ mt: 0.6, mr: 1 }}
@@ -120,22 +108,8 @@ export default function FormDetailsStats({ form }) {
             severity="success"
             icon={<RateReviewIcon fontSize="inherit" />}
           >
-            <Box sx={{ fontSize: 14, pr: 3 }}>{form.numeroRespuestas}</Box>
+            <Box sx={{ fontSize: 14, pr: 3 }}>{form.answersNumber}</Box>
           </Alert>
-          {/* <Typography variant="h6" component="div" sx={styles.header3}>
-            Enlace
-          </Typography>
-          <Alert
-            severity="success"
-            icon={<LinkIcon fontSize="inherit" />}
-            action={
-              <Button color="inherit" size="small" onClick={copyToClipboard}>
-                COPIAR
-              </Button>
-            }
-          >
-            <Box sx={{ fontSize: 14, pr: 3 }}>{formURL}</Box>
-          </Alert> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cerrar</Button>

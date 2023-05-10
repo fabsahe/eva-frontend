@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
@@ -16,6 +17,11 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 import formService from '../../services/formService'
 import answerService from '../../services/answerService'
 import PieChart from './PieChart'
+import Radios from './types/Radios'
+import Checkboxes from './types/Checkboxes'
+import Scale from './types/Scale'
+import RadioGrid from './types/RadioGrid'
+import OpenEnded from './types/OpenEnded'
 import { useImageData, useChartActions } from '../../store/chartStore'
 import createDocument from '../../utils/createDocument'
 
@@ -47,90 +53,61 @@ export default function FormStats() {
   const params = useParams()
   const formId = params.id
 
-  function removeDuplicates(arr) {
-    return arr.filter((item, index) => arr.indexOf(item) === index)
-  }
-
-  const getCareers = async (answerSet) => {
-    const careerResponse = await axios.get('http://localhost:3001/api/careers')
-    const allCareers = careerResponse.data.data
-    const currentCareers = answerSet.map((item) => item.carrera)
-    const careerIdList = removeDuplicates(currentCareers)
-    const careerListArr = allCareers.filter((item) =>
-      careerIdList.includes(item._id)
-    )
-    setCareerList(careerListArr)
-    setFilterList(careerListArr)
-    setFilter(careerListArr[0]._id)
-  }
-
-  const getProfessors = async (answerSet) => {
-    const professorResponse = await axios.get(
-      'http://localhost:3001/api/professors'
-    )
-    const allProfessors = professorResponse.data.data
-    const currentProfessors = answerSet.map((item) => item.profesor)
-    const professorIdList = removeDuplicates(currentProfessors)
-    const professorListArr = allProfessors.filter((item) =>
-      professorIdList.includes(item._id)
-    )
-    setProfessorList(professorListArr)
-  }
-
-  const getGroups = (answerSet) => {
-    const currentGroups = answerSet.map((item) => item.grupo)
-    const groupListArr = removeDuplicates(currentGroups)
-    const groupListArrObj = groupListArr.map((item) => ({
-      _id: item,
-      nombre: item
-    }))
-    setGroupList(groupListArrObj)
-  }
-
-  const getFilters = async () => {
-    const response = await answerService.getAnswers(formId)
-    const answerSet = response.data
-
-    setAllAnswers(answerSet)
-
-    await getCareers(answerSet)
-    await getProfessors(answerSet)
-    getGroups(answerSet)
+  const getResult = (type, answerList, index, subQuestions) => {
+    const typeMap = {
+      radios: <Radios answers={answerList} index={index} filter={memoFilter} />,
+      checkboxes: (
+        <Checkboxes answers={answerList} index={index} filter={memoFilter} />
+      ),
+      scale: <Scale answers={answerList} index={index} filter={memoFilter} />,
+      grid: (
+        <RadioGrid
+          subQuestions={subQuestions}
+          answers={answerList}
+          index={index}
+          filter={memoFilter}
+        />
+      ),
+      'open-ended': <OpenEnded answers={answerList} />
+    }
+    return typeMap[type] ?? null
   }
 
   const getForm = async () => {
-    const response = await formService.getOneForm(formId)
+    const response = await answerService.getFormAnswers(formId)
     if (response.status === 'OK') {
       const { data } = response
-      setForm(data.preguntas)
-      setTitle(data.titulo)
-      setQuestions(data.preguntas)
-      getFilters()
+      setTitle(data.title)
+      setQuestions(data.questions)
+
+      setCareerList(data.careers)
+      setFilterList(data.careers)
+      setFilter(data.careers[0]._id)
+
+      setProfessorList(data.professors)
+
+      setGroupList(data.groups)
     }
   }
 
   const getAnswers = () => {
     const filterProp = filterLabel[filterType].toLowerCase()
-    const filterAnswers = allAnswers.filter(
-      (item) => item[filterProp] === filter
-    )
-    const emptyAnswers = questions.map((item) => ({
-      key: item._id,
-      value: []
-    }))
-    const groupedAnswers = emptyAnswers.reduce(
-      (obj, item) => Object.assign(obj, { [item.key]: item.value }),
-      {}
-    )
-    filterAnswers.forEach((answerList) => {
-      answerList.respuestas.forEach((answer) => {
-        groupedAnswers[answer.pregunta].push({
-          id: answer._id,
-          texto: answer.respuesta
-        })
-      })
+    const filteredArr = questions.map((question) => {
+      const questionAnswers = question.answers
+      const questionFiltered = questionAnswers.filter(
+        (item) => item[filterType] === filter
+      )
+      const answersArr = questionFiltered.map((q) => q.answers)
+      return {
+        question: question.id,
+        answers: answersArr
+      }
     })
-    setAnswers(groupedAnswers)
+    const filteredAnswers = filteredArr.reduce((acc, curr) => {
+      acc[curr.question] = curr.answers
+      return acc
+    }, {})
+    setAnswers(filteredAnswers)
   }
 
   const handleChangeFilterType = (event) => {
@@ -224,10 +201,10 @@ export default function FormStats() {
             </Typography>
           </Paper>
 
-          {form &&
-            form.map((itemQ, index) => (
+          {questions &&
+            questions.map((question, index) => (
               <Paper
-                key={itemQ._id}
+                key={question.id}
                 sx={{
                   p: 2,
                   mb: 3,
@@ -235,24 +212,21 @@ export default function FormStats() {
                   flexDirection: 'column'
                 }}
               >
-                <Typography variant="h6" component="div" sx={{ mb: 0 }}>
-                  {`${index + 1} - ${itemQ.pregunta}`}
+                <Typography
+                  variant="subtitle1"
+                  component="h1"
+                  sx={{ mb: 0, fontWeight: 500, fontSize: 18 }}
+                >
+                  {`${index + 1}.- ${question.sentence}`}
                 </Typography>
 
-                {itemQ.opciones.length !== 0 ? (
-                  <PieChart
-                    raw={answers ? answers[itemQ._id] : []}
-                    index={index}
-                    filter={memoFilter}
-                  />
-                ) : (
-                  <ul>
-                    {answers &&
-                      answers[itemQ._id].map((itemA) => (
-                        <li key={itemA.id}>{itemA.texto}</li>
-                      ))}
-                  </ul>
-                )}
+                {answers &&
+                  getResult(
+                    question.type,
+                    answers[question.id],
+                    index,
+                    question.subQuestions ?? []
+                  )}
               </Paper>
             ))}
         </Grid>

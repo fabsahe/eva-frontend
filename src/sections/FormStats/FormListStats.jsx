@@ -49,10 +49,10 @@ export default function FormListStats() {
       const rowsData = data.map((form, index) => ({
         id: index + 1,
         uid: form._id,
-        title: form.titulo,
-        period: `${form.año}-${form.periodo}`,
-        user: form.usuario.name,
-        count: form.numeroRespuestas
+        title: form.title,
+        period: `${form.year}-${form.period}`,
+        user: form.user.name,
+        count: form.answersNumber
       }))
       setRows(rowsData)
       setLoading(false)

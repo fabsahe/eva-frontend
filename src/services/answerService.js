@@ -3,7 +3,7 @@ import API_URL from '../constants/api'
 
 const baseURL = `${API_URL}/api/answers`
 
-const getAnswers = async (formId) => {
+const getFormAnswers = async (formId) => {
   const { data } = await axios.get(`${baseURL}/${formId}`)
   return data
 }
@@ -13,4 +13,4 @@ const createNewAnswers = async (formId, answers) => {
   return response
 }
 
-export default { getAnswers, createNewAnswers }
+export default { getFormAnswers, createNewAnswers }
