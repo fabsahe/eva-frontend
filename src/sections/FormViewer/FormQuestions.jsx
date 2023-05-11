@@ -1,10 +1,12 @@
-import React from 'react'
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect, useRef } from 'react'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
+import Alert from '@mui/material/Alert'
 import { useSnackbar } from 'notistack'
 import OpenEnded from './types/OpenEnded'
 import Radios from './types/Radios'
@@ -23,7 +25,26 @@ import {
   useFormViewerActions
 } from '../../store/formViewerStore'
 
+const normalPaper = {
+  p: 2,
+  display: 'flex',
+  flexDirection: 'column'
+}
+
+const errorPaper = {
+  p: 2,
+  display: 'flex',
+  flexDirection: 'column',
+  border: '2px solid #F8EDEE'
+}
+
 export default function FormViewer() {
+  const [errorList, setErrorList] = useState([])
+  const [validForm, setValidForm] = useState(true)
+  const [submitClicked, setSubmitClicked] = useState(0)
+
+  const alertRef = useRef(null)
+
   const formId = useFormId()
   const career = useCareer()
   const group = useGroup()
@@ -47,7 +68,34 @@ export default function FormViewer() {
     return typeMap[type] ?? null
   }
 
+  const validateAnswers = () => {
+    const questionsToValidate = questions
+      .filter((question) => question.type !== 'checkboxes')
+      .map((question) => question._id)
+    const answersToValidate = answers.filter((answer) =>
+      questionsToValidate.includes(answer.question)
+    )
+    const validations = answersToValidate.map((answer) => ({
+      question: answer.question,
+      error: answer.answers.length === 0
+    }))
+    const errors = validations.reduce((acc, { question, error }) => {
+      acc[question] = error
+      return acc
+    }, {})
+    setErrorList(errors)
+    return !Object.values(errors).includes(true)
+  }
+
   const handleSubmit = async () => {
+    const isValid = validateAnswers()
+    if (!isValid) {
+      setValidForm(false)
+      setSubmitClicked(submitClicked + 1)
+      return
+    }
+    setValidForm(true)
+
     const newAnswers = answers.map((answer) => ({
       career,
       group,
@@ -65,16 +113,26 @@ export default function FormViewer() {
     }
   }
 
+  useEffect(() => {
+    if (!validForm) {
+      alertRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [validForm, submitClicked])
+
   return (
     <Grid container spacing={2}>
+      {!validForm ? (
+        <Grid item md={12} lg={12} ref={alertRef}>
+          <Alert severity="error">
+            Parece que olvidaste responder algunas preguntas
+          </Alert>
+        </Grid>
+      ) : null}
+
       {questions.map((question, index) => (
         <Grid item key={question._id} md={12} lg={12}>
           <Paper
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column'
-            }}
+            sx={!errorList[question._id] ? normalPaper : errorPaper}
             variant="outlined"
           >
             <Typography
@@ -87,6 +145,23 @@ export default function FormViewer() {
 
             {getInputs(question)}
           </Paper>
+
+          {errorList[question._id] ? (
+            <Box>
+              <Typography
+                variant="body2"
+                component="h1"
+                sx={{
+                  backgroundColor: '#F8EDEE',
+                  color: '#4B2124',
+                  py: 1,
+                  px: 2
+                }}
+              >
+                ¿Olvidaste esta pregunta?
+              </Typography>
+            </Box>
+          ) : null}
         </Grid>
       ))}
 

@@ -99,15 +99,21 @@ export default function FormStepper() {
   }
 
   const handleNextGroups = () => {
-    setActiveStep(1)
+    if (career) {
+      setActiveStep(1)
+    }
   }
 
   const handleNextProfessors = () => {
-    setActiveStep(2)
+    if (group) {
+      setActiveStep(2)
+    }
   }
 
   const handleStart = () => {
-    setSection('questions')
+    if (professor) {
+      setSection('questions')
+    }
   }
 
   return (
