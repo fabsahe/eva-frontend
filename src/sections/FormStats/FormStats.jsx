@@ -185,20 +185,21 @@ export default function FormStats() {
           <Paper
             sx={{
               p: 2,
-              mb: 3,
-              display: 'flex',
-              flexDirection: 'column'
+              mb: 3
             }}
           >
-            <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-              Respuestas para el cuestionario{' '}
-              <Typography
-                component="span"
-                variant="h5"
-                sx={{ color: '#a8c256', borderBottom: '1px dashed' }}
-              >
-                {title}
-              </Typography>
+            <Typography component="h1" variant="h5" sx={{ mb: 0.2 }}>
+              Respuestas para el cuestionario:
+            </Typography>
+            <Typography
+              component="span"
+              variant="h5"
+              sx={{
+                color: '#6e851d',
+                borderBottom: '1px dashed'
+              }}
+            >
+              {title}
             </Typography>
           </Paper>
 
