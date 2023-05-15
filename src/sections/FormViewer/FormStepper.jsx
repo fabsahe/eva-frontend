@@ -9,7 +9,6 @@ import Button from '@mui/material/Button'
 import Stepper from '@mui/material/Stepper'
 import Step from '@mui/material/Step'
 import StepLabel from '@mui/material/StepLabel'
-import axios from 'axios'
 import {
   useCareers,
   useYear,
@@ -19,6 +18,7 @@ import {
   useProfessor,
   useFormViewerActions
 } from '../../store/formViewerStore'
+import assignmentService from '../../services/assignmentService'
 
 const steps = [
   'Seleccionar carrera',
@@ -49,12 +49,12 @@ export default function FormStepper() {
   const handleChangeCareer = async (event) => {
     const careerId = event.target.value
     setCareer(careerId)
-    const assignments = await axios.get(
-      `http://localhost:3001/api/assignments/${careerId}?year=${year}&period=${period}`
+    const assignments = await assignmentService.getAssignmentsByCareer(
+      careerId,
+      year,
+      period
     )
-    const allGroups = assignments.data.data.map(
-      (assignment) => assignment.grupo
-    )
+    const allGroups = assignments.data.map((assignment) => assignment.grupo)
     // eliminar repetidos
     const currentGroups = allGroups.filter(
       (item, index) => allGroups.indexOf(item) === index
@@ -84,10 +84,12 @@ export default function FormStepper() {
   const handleChangeGroup = async (event) => {
     const groupName = event.target.value
     setGroup(groupName)
-    const professorsResponse = await axios.get(
-      `http://localhost:3001/api/assignments/professors/${groupName}?year=${year}&period=${period}`
+    const professorsResponse = await assignmentService.getProfessorsByGroup(
+      groupName,
+      year,
+      period
     )
-    setProfessors(professorsResponse.data.data)
+    setProfessors(professorsResponse.data)
   }
 
   const handleChangeProfessor = (event) => {

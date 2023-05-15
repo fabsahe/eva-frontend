@@ -6,12 +6,12 @@ import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
-import axios from 'axios'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { NOTI_SUCCESS, NOTI_ERROR } from '../../constants/notiConstants'
 import formService from '../../services/formService'
-// import answerService from '../../services/answerService'
+import careerService from '../../services/careerService'
+import periodService from '../../services/periodService'
 import Identification from './Identification'
 import Configuration from './Configuration'
 import QuestionPreview from './QuestionPreview'
@@ -94,8 +94,9 @@ export default function FormEditor({ mode }) {
 
   const getCareers = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/careers')
-      const sortedCareers = sortCareers(response.data.data)
+      const response = await careerService.getAllCareers()
+      const { data } = response
+      const sortedCareers = sortCareers(data)
       setCareerList(sortedCareers)
     } catch (err) {
       console.error(err)
@@ -104,8 +105,9 @@ export default function FormEditor({ mode }) {
 
   const getPeriods = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/periods')
-      setPeriodList(response.data.data)
+      const response = await periodService.getAllPeriods()
+      const { data } = response
+      setPeriodList(data)
     } catch (err) {
       console.error(err)
     }
