@@ -87,13 +87,16 @@ export default function FormStats() {
     }
   }
 
-  const getAnswers = () => {
+  const getAnswers = (noFilter = false) => {
     const filteredArr = questions.map((question) => {
       const questionAnswers = question.answers
-      const questionFiltered = questionAnswers.filter(
-        (item) => item[filterType] === filter
-      )
-      const answersArr = questionFiltered.map((q) => q.answers)
+      let questionsFiltered = questionAnswers
+      if (!noFilter) {
+        questionsFiltered = questionAnswers.filter(
+          (item) => item[filterType] === filter
+        )
+      }
+      const answersArr = questionsFiltered.map((q) => q.answers)
       return {
         question: question.id,
         answers: answersArr
@@ -124,7 +127,9 @@ export default function FormStats() {
   }, [])
 
   useEffect(() => {
-    if (filterType) {
+    if (filterType === 'all') {
+      getAnswers(true)
+    } else if (filterType) {
       const filtersMap = {
         career: careerList,
         professor: professorList,
@@ -251,6 +256,7 @@ export default function FormStats() {
                 onChange={handleChangeFilterType}
                 required
               >
+                <MenuItem value="all">Todas las respuestas</MenuItem>
                 <MenuItem value="career">Carrera</MenuItem>
                 <MenuItem value="professor">Profesor</MenuItem>
                 <MenuItem value="group">Grupo</MenuItem>
@@ -258,26 +264,28 @@ export default function FormStats() {
             </FormControl>
             <Box sx={{ mb: 2 }} />
 
-            <FormControl fullWidth>
-              <InputLabel id="filter-select-label">
-                {filterLabel[filterType]}
-              </InputLabel>
-              <Select
-                labelId="filter-select-label"
-                id="filter-form-select"
-                label={filterLabel[filterType]}
-                value={filter}
-                onChange={handleChangeFilter}
-                required
-              >
-                {filterList &&
-                  filterList.map((item) => (
-                    <MenuItem key={item._id} value={item._id}>
-                      {item.nombre}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
+            {filterType !== 'all' ? (
+              <FormControl fullWidth>
+                <InputLabel id="filter-select-label">
+                  {filterLabel[filterType]}
+                </InputLabel>
+                <Select
+                  labelId="filter-select-label"
+                  id="filter-form-select"
+                  label={filterLabel[filterType]}
+                  value={filter}
+                  onChange={handleChangeFilter}
+                  required
+                >
+                  {filterList &&
+                    filterList.map((item) => (
+                      <MenuItem key={item._id} value={item._id}>
+                        {item.nombre}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            ) : null}
           </Paper>
         </Grid>
       </Grid>

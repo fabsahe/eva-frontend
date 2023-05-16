@@ -64,7 +64,6 @@ export default function QuestionEditor() {
       ...prevQuestions,
       { key, sentence: questionSentence, type: questionType, options }
     ]
-    console.log(newQuestions)
     setQuestions(newQuestions)
   }
 

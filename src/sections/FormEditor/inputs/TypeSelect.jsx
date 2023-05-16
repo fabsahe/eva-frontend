@@ -84,7 +84,6 @@ export default function TypeSelect() {
   const handleChangeType = (event) => {
     const map = JSON.parse(JSON.stringify(typeOptionsMap))
     const type = event.target.value
-    console.log('TYPE = ', type)
     const options = map[type]
 
     if (options) {
