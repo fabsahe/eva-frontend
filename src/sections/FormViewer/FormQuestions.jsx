@@ -10,6 +10,7 @@ import Alert from '@mui/material/Alert'
 import { useSnackbar } from 'notistack'
 import OpenEnded from './types/OpenEnded'
 import Radios from './types/Radios'
+import Dropdown from './types/Dropdown'
 import Checkboxes from './types/Checkboxes'
 import Scale from './types/Scale'
 import RadioGrid from './types/RadioGrid'
@@ -61,6 +62,7 @@ export default function FormViewer() {
     const typeMap = {
       'open-ended': <OpenEnded questionId={id} />,
       radios: <Radios questionId={id} options={options} />,
+      dropdown: <Dropdown questionId={id} options={options} />,
       checkboxes: <Checkboxes questionId={id} options={options} />,
       scale: <Scale questionId={id} options={options} />,
       grid: <RadioGrid questionId={id} options={options} />

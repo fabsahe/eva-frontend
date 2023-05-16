@@ -10,6 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { grey } from '@mui/material/colors'
 import OpenEnded from './previews/OpenEnded'
 import Radios from './previews/Radios'
+import Dropdown from './previews/Dropdown'
 import Checkboxes from './previews/Checkboxes'
 import Scale from './previews/Scale'
 import RadioGrid from './previews/RadioGrid'
@@ -35,6 +36,7 @@ export default function QuestionPreview({ question, index }) {
   const previews = {
     'open-ended': <OpenEnded />,
     radios: <Radios options={question.options} />,
+    dropdown: <Dropdown options={question.options} />,
     checkboxes: <Checkboxes options={question.options} />,
     scale: <Scale options={question.options} />,
     grid: <RadioGrid options={question.options} />

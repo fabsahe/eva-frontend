@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 const today = dayjs()
 const initOptions = {
   radios: [],
+  dropdown: [],
   checkboxes: [],
   scale: [],
   labels: [],

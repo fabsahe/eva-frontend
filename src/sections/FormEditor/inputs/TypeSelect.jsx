@@ -5,6 +5,7 @@ import Select from '@mui/material/Select'
 import FormControl from '@mui/material/FormControl'
 import CreateIcon from '@mui/icons-material/Create'
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import ExpandCircleDownOutlinedIcon from '@mui/icons-material/ExpandCircleDownOutlined'
 import CheckBoxIcon from '@mui/icons-material/CheckBoxOutlined'
 import LinearScaleIcon from '@mui/icons-material/LinearScale'
 import AppsRoundedIcon from '@mui/icons-material/AppsRounded'
@@ -26,6 +27,12 @@ const types = [
     icon: <RadioButtonCheckedIcon sx={iconStyle} />,
     icon2: <RadioButtonCheckedIcon sx={iconStyle2} />,
     text: 'Opción múltiple'
+  },
+  {
+    value: 'dropdown',
+    icon: <ExpandCircleDownOutlinedIcon sx={iconStyle} />,
+    icon2: <ExpandCircleDownOutlinedIcon sx={iconStyle2} />,
+    text: 'Lista despegable'
   },
   {
     value: 'checkboxes',
@@ -52,6 +59,9 @@ const typeOptionsMap = {
   radios: {
     radios: [{ key: 0, value: 'Opción 1' }]
   },
+  dropdown: {
+    dropdown: [{ key: 0, value: 'Opción 1' }]
+  },
   checkboxes: {
     checkboxes: [{ key: 0, value: 'Opción 1', checked: false }]
   },
@@ -74,6 +84,7 @@ export default function TypeSelect() {
   const handleChangeType = (event) => {
     const map = JSON.parse(JSON.stringify(typeOptionsMap))
     const type = event.target.value
+    console.log('TYPE = ', type)
     const options = map[type]
 
     if (options) {

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
@@ -13,9 +12,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
-import formService from '../../services/formService'
 import answerService from '../../services/answerService'
-import PieChart from './PieChart'
 import Radios from './types/Radios'
 import Checkboxes from './types/Checkboxes'
 import Scale from './types/Scale'
@@ -34,8 +31,6 @@ const filterLabel = {
 
 export default function FormStats() {
   const [questions, setQuestions] = useState([])
-  const [allAnswers, setAllAnswers] = useState([])
-  const [form, setForm] = useState([])
   const [title, setTitle] = useState('')
   const [answers, setAnswers] = useState(null)
   const [filterType, setFilterType] = useState('career')
@@ -55,6 +50,9 @@ export default function FormStats() {
   const getResult = (type, answerList, index, subQuestions) => {
     const typeMap = {
       radios: <Radios answers={answerList} index={index} filter={memoFilter} />,
+      dropdown: (
+        <Radios answers={answerList} index={index} filter={memoFilter} />
+      ),
       checkboxes: (
         <Checkboxes answers={answerList} index={index} filter={memoFilter} />
       ),
@@ -90,7 +88,6 @@ export default function FormStats() {
   }
 
   const getAnswers = () => {
-    const filterProp = filterLabel[filterType].toLowerCase()
     const filteredArr = questions.map((question) => {
       const questionAnswers = question.answers
       const questionFiltered = questionAnswers.filter(

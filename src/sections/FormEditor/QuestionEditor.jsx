@@ -12,6 +12,10 @@ import { grey } from '@mui/material/colors'
 import { useSnackbar } from 'notistack'
 import TypeSelect from './inputs/TypeSelect'
 import Radios from './inputs/Radios'
+import Dropdown from './inputs/Dropdown'
+import Checkboxes from './inputs/Checkboxes'
+import Scale from './inputs/Scale'
+import RadioGrid from './inputs/RadioGrid'
 import {
   useQuestions,
   useQuestionMode,
@@ -21,13 +25,11 @@ import {
   useOptions,
   useFormActions
 } from '../../store/formStore'
-import Checkboxes from './inputs/Checkboxes'
-import Scale from './inputs/Scale'
-import RadioGrid from './inputs/RadioGrid'
 
 const typeEditor = {
   'open-ended': null,
   radios: <Radios />,
+  dropdown: <Dropdown />,
   checkboxes: <Checkboxes />,
   scale: <Scale />,
   grid: <RadioGrid />
@@ -62,6 +64,7 @@ export default function QuestionEditor() {
       ...prevQuestions,
       { key, sentence: questionSentence, type: questionType, options }
     ]
+    console.log(newQuestions)
     setQuestions(newQuestions)
   }
 
