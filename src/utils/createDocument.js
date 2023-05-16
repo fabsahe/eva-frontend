@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const filterPDF = {
   career: 'la carrera',
   professor: 'el profesor',

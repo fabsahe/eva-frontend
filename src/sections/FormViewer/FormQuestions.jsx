@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'

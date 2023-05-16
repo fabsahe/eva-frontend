@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useMemo } from 'react'
 import Grid from '@mui/material/Grid'
@@ -27,13 +26,6 @@ const plugin = {
     ctx.fillRect(0, 0, chart.width, chart.height)
     ctx.restore()
   }
-}
-
-function yInteger(value) {
-  if (value % 1 === 0) {
-    return value
-  }
-  return null
 }
 
 const options = {
