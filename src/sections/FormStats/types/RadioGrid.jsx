@@ -73,7 +73,7 @@ function SubChart({ subAnswers, index, subIndex, filter }) {
   }, [download])
 
   return (
-    <Box sx={{ pt: 0, px: 4, mb: 1 }}>
+    <Box sx={{ pt: 0, px: 2, mb: 1 }}>
       <Pie ref={chartRef} data={data} options={pieOptions} plugins={[plugin]} />
     </Box>
   )

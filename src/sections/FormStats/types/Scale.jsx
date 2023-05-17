@@ -53,7 +53,7 @@ export default function Scale({ answers, index, filter }) {
   const download = useDownload()
   const { addImage } = useChartActions()
 
-  const answersArr = answers.flat()
+  const answersArr = answers.flat().sort()
   const map = answersArr.reduce(
     (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
     new Map()
