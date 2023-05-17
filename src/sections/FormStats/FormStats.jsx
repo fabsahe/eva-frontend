@@ -48,26 +48,22 @@ export default function FormStats() {
   const params = useParams()
   const formId = params.id
 
-  const getResult = (type, answerList, index, subQuestions) => {
+  const getResult = (index, type, labels, subQuestions, answerList) => {
     const typeMap = {
       radios: <Radios answers={answerList} index={index} filter={memoFilter} />,
       dropdown: (
         <Dropdown answers={answerList} index={index} filter={memoFilter} />
       ),
       checkboxes: (
-        <Checkboxes
-          subQuestions={subQuestions}
-          answers={answerList}
-          index={index}
-          filter={memoFilter}
-        />
+        <Checkboxes index={index} labels={labels} answers={answerList} />
       ),
       scale: <Scale answers={answerList} index={index} filter={memoFilter} />,
       grid: (
         <RadioGrid
+          index={index}
+          labels={labels}
           subQuestions={subQuestions}
           answers={answerList}
-          index={index}
           filter={memoFilter}
         />
       ),
@@ -231,10 +227,11 @@ export default function FormStats() {
 
                 {answers &&
                   getResult(
-                    question.type,
-                    answers[question.id],
                     index,
-                    question.subQuestions ?? []
+                    question.type,
+                    question.labels ?? [],
+                    question.subQuestions ?? [],
+                    answers[question.id]
                   )}
               </Paper>
             ))}

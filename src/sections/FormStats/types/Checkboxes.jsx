@@ -27,7 +27,7 @@ const plugin = {
   }
 }
 
-const options = {
+const chartOptions = {
   responsive: true,
 
   plugins: {
@@ -40,7 +40,7 @@ const options = {
   }
 }
 
-export default function Checkboxes({ subQuestions, answers, index }) {
+export default function Checkboxes({ index, labels, answers }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -54,7 +54,7 @@ export default function Checkboxes({ subQuestions, answers, index }) {
     return acc
   }, {})
 
-  const yesData = subQuestions.map((element) => {
+  const yesData = labels.map((element) => {
     if (element in answersCounter) {
       return answersCounter[element]
     }
@@ -65,7 +65,7 @@ export default function Checkboxes({ subQuestions, answers, index }) {
   })
 
   const data = {
-    labels: subQuestions,
+    labels,
     datasets: [
       {
         label: 'Sí',
@@ -101,7 +101,7 @@ export default function Checkboxes({ subQuestions, answers, index }) {
           <Bar
             ref={chartRef}
             data={data}
-            options={options}
+            options={chartOptions}
             plugins={[plugin]}
           />
         </Box>

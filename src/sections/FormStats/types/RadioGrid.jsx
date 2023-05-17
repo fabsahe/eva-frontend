@@ -30,7 +30,14 @@ const generateRandomColors = (count) => {
   })
 }
 
-function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
+function SubQuestion({
+  sentence,
+  labels,
+  subAnswers,
+  index,
+  subIndex,
+  filter
+}) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -41,7 +48,18 @@ function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
     new Map()
   )
   const keys = [...map.keys()]
-  const values = [...map.values()]
+  const valuesoLD = [...map.values()]
+
+  const answersCounter = subAnswers.reduce((acc, elemento) => {
+    acc[elemento] = (acc[elemento] || 0) + 1
+    return acc
+  }, {})
+  const values = labels.map((element) => {
+    if (element in answersCounter) {
+      return answersCounter[element]
+    }
+    return 0
+  })
 
   const colors = useMemo(
     () => generateRandomColors(keys.length),
@@ -49,7 +67,7 @@ function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
   )
 
   const data = {
-    labels: keys,
+    labels,
     datasets: [
       {
         label: 'Respuestas',
@@ -89,7 +107,13 @@ function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
   )
 }
 
-export default function RadioGrid({ answers, index, filter, subQuestions }) {
+export default function RadioGrid({
+  index,
+  labels,
+  subQuestions,
+  answers,
+  filter
+}) {
   const groupedAnswers = answers[0].map((_, i) => answers.map((row) => row[i]))
 
   const rowNumber = Math.ceil(subQuestions.length / 2)
@@ -105,6 +129,7 @@ export default function RadioGrid({ answers, index, filter, subQuestions }) {
         <SubQuestion
           key={item.id}
           sentence={item.value}
+          labels={labels}
           subAnswers={groupedAnswers[subIndex]}
           index={index}
           subIndex={subIndex}
