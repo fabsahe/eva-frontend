@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useMemo } from 'react'
 import Grid from '@mui/material/Grid'
@@ -36,19 +35,12 @@ function SubQuestion({
   subAnswers,
   index,
   subIndex,
-  filter
+  colors
 }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
   const { addImage } = useChartActions()
-
-  const map = subAnswers.reduce(
-    (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-    new Map()
-  )
-  const keys = [...map.keys()]
-  const valuesoLD = [...map.values()]
 
   const answersCounter = subAnswers.reduce((acc, elemento) => {
     acc[elemento] = (acc[elemento] || 0) + 1
@@ -60,11 +52,6 @@ function SubQuestion({
     }
     return 0
   })
-
-  const colors = useMemo(
-    () => generateRandomColors(keys.length),
-    [keys.length, filter]
-  )
 
   const data = {
     labels,
@@ -92,7 +79,17 @@ function SubQuestion({
 
   return (
     <Grid item xs={12} md={12} lg={12}>
-      <Typography variant="body1" component="div" sx={{ textIndent: 10 }}>
+      {/* <Typography variant="body1" component="div" sx={{ textIndent: 10 }}>
+        {sentence}
+  </Typography> */}
+      <Typography
+        variant="body1"
+        component="li"
+        sx={{
+          listStyleType: 'disc',
+          marginLeft: 2 // Opcional: Ajusta el espaciado según tus necesidades
+        }}
+      >
         {sentence}
       </Typography>
       <Box sx={{ pt: 0, px: 4, mb: 0 }}>
@@ -116,12 +113,10 @@ export default function RadioGrid({
 }) {
   const groupedAnswers = answers[0].map((_, i) => answers.map((row) => row[i]))
 
-  const rowNumber = Math.ceil(subQuestions.length / 2)
-  const rows = Array.from({ length: rowNumber }, (_, iter) => ({
-    key: iter,
-    col1: iter * 2,
-    col2: iter * 2 + 1
-  }))
+  const colors = useMemo(
+    () => generateRandomColors(labels.length),
+    [labels, filter]
+  )
 
   return (
     <Grid container spacing={1}>
@@ -133,7 +128,7 @@ export default function RadioGrid({
           subAnswers={groupedAnswers[subIndex]}
           index={index}
           subIndex={subIndex}
-          filter={filter}
+          colors={colors}
         />
       ))}
     </Grid>
