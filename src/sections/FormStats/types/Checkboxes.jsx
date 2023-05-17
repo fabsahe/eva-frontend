@@ -68,15 +68,15 @@ export default function Checkboxes({ subQuestions, answers, index }) {
     labels: subQuestions,
     datasets: [
       {
-        label: 'No',
-        data: noData,
-        backgroundColor: 'rgba(255, 51, 97, 0.8)',
+        label: 'Sí',
+        data: yesData,
+        backgroundColor: '#5add82',
         borderWidth: 1
       },
       {
-        label: 'Sí',
-        data: yesData,
-        backgroundColor: 'rgba(28, 176, 100, 0.8)',
+        label: 'No',
+        data: noData,
+        backgroundColor: '#db4c75',
         borderWidth: 1
       }
     ]

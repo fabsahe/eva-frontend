@@ -25,10 +25,10 @@ const generateLabels = (chart) => {
   return []
 }
 
-const pieOptions = {
+const subPieOptions = {
   responsive: true,
-  radius: 120,
-  aspectRatio: 2.2,
+  radius: 100,
+  aspectRatio: 2.6,
   plugins: {
     legend: {
       position: 'right',
@@ -45,4 +45,4 @@ const pieOptions = {
     }
   }
 }
-export default pieOptions
+export default subPieOptions

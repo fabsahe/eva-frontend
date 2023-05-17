@@ -14,6 +14,7 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 import answerService from '../../services/answerService'
 import Radios from './types/Radios'
+import Dropdown from './types/Dropdown'
 import Checkboxes from './types/Checkboxes'
 import Scale from './types/Scale'
 import RadioGrid from './types/RadioGrid'
@@ -51,7 +52,7 @@ export default function FormStats() {
     const typeMap = {
       radios: <Radios answers={answerList} index={index} filter={memoFilter} />,
       dropdown: (
-        <Radios answers={answerList} index={index} filter={memoFilter} />
+        <Dropdown answers={answerList} index={index} filter={memoFilter} />
       ),
       checkboxes: (
         <Checkboxes

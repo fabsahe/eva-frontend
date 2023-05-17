@@ -8,7 +8,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
 import randomColor from 'randomcolor'
 import { useDownload, useChartActions } from '../../../store/chartStore'
-import pieOptions from '../../../constants/pieOptions'
+import subPieOptions from '../../../constants/subPieOptions'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -30,7 +30,7 @@ const generateRandomColors = (count) => {
   })
 }
 
-function SubChart({ subAnswers, index, subIndex, filter }) {
+function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -73,9 +73,19 @@ function SubChart({ subAnswers, index, subIndex, filter }) {
   }, [download])
 
   return (
-    <Box sx={{ pt: 0, px: 2, mb: 1 }}>
-      <Pie ref={chartRef} data={data} options={pieOptions} plugins={[plugin]} />
-    </Box>
+    <Grid item xs={12} md={12} lg={12}>
+      <Typography variant="body1" component="div" sx={{ textIndent: 10 }}>
+        {sentence}
+      </Typography>
+      <Box sx={{ pt: 0, px: 4, mb: 0 }}>
+        <Pie
+          ref={chartRef}
+          data={data}
+          options={subPieOptions}
+          plugins={[plugin]}
+        />
+      </Box>
+    </Grid>
   )
 }
 
@@ -90,38 +100,17 @@ export default function RadioGrid({ answers, index, filter, subQuestions }) {
   }))
 
   return (
-    <>
-      {rows.map((row) => (
-        <Grid container key={row.key} spacing={1} sx={{ mt: 0.5 }}>
-          <Grid item xs={12} md={6} lg={6}>
-            <Typography variant="body1" component="div">
-              {subQuestions[row.col1].value}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Typography variant="body1" component="div">
-              {subQuestions[row.col2].value}
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={6}>
-            <SubChart
-              subAnswers={groupedAnswers[row.col1]}
-              index={index}
-              subIndex={row.col1}
-              filter={filter}
-            />
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <SubChart
-              subAnswers={groupedAnswers[row.col2]}
-              index={index}
-              subIndex={row.col2}
-              filter={filter}
-            />
-          </Grid>
-        </Grid>
+    <Grid container spacing={1}>
+      {subQuestions.map((item, subIndex) => (
+        <SubQuestion
+          key={item.id}
+          sentence={item.value}
+          subAnswers={groupedAnswers[subIndex]}
+          index={index}
+          subIndex={subIndex}
+          filter={filter}
+        />
       ))}
-    </>
+    </Grid>
   )
 }

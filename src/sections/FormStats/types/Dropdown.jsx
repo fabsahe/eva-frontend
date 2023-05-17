@@ -28,7 +28,7 @@ const generateRandomColors = (count) => {
   })
 }
 
-export default function Radios({ answers, index, filter }) {
+export default function Dropdown({ answers, index, filter }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -75,7 +75,7 @@ export default function Radios({ answers, index, filter }) {
     <Grid container>
       <Grid item xs={12} md={1} lg={1} />
       <Grid item xs={12} md={10} lg={10}>
-        <Box sx={{ p: 0, mb: 0 }}>
+        <Box sx={{ p: 0, mt: 0.5, mb: 0 }}>
           <Pie
             ref={chartRef}
             data={data}
