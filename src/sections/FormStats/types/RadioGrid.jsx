@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useMemo } from 'react'
 import Grid from '@mui/material/Grid'
@@ -29,7 +30,7 @@ const generateRandomColors = (count) => {
   })
 }
 
-function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
+function SubChart({ subAnswers, index, subIndex, filter }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
@@ -72,37 +73,55 @@ function SubQuestion({ sentence, subAnswers, index, subIndex, filter }) {
   }, [download])
 
   return (
-    <Grid item xs={12} md={6} lg={6}>
-      <Typography variant="body1" component="div">
-        {sentence}
-      </Typography>
-      <Box sx={{ pt: 0, px: 4, mb: 1 }}>
-        <Pie
-          ref={chartRef}
-          data={data}
-          options={pieOptions}
-          plugins={[plugin]}
-        />
-      </Box>
-    </Grid>
+    <Box sx={{ pt: 0, px: 4, mb: 1 }}>
+      <Pie ref={chartRef} data={data} options={pieOptions} plugins={[plugin]} />
+    </Box>
   )
 }
 
 export default function RadioGrid({ answers, index, filter, subQuestions }) {
   const groupedAnswers = answers[0].map((_, i) => answers.map((row) => row[i]))
 
+  const rowNumber = Math.ceil(subQuestions.length / 2)
+  const rows = Array.from({ length: rowNumber }, (_, iter) => ({
+    key: iter,
+    col1: iter * 2,
+    col2: iter * 2 + 1
+  }))
+
   return (
-    <Grid container spacing={3}>
-      {subQuestions.map((item, subIndex) => (
-        <SubQuestion
-          key={item.id}
-          sentence={item.value}
-          subAnswers={groupedAnswers[subIndex]}
-          index={index}
-          subIndex={subIndex}
-          filter={filter}
-        />
+    <>
+      {rows.map((row) => (
+        <Grid container key={row.key} spacing={1} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} md={6} lg={6}>
+            <Typography variant="body1" component="div">
+              {subQuestions[row.col1].value}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={6} lg={6}>
+            <Typography variant="body1" component="div">
+              {subQuestions[row.col2].value}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} md={6} lg={6}>
+            <SubChart
+              subAnswers={groupedAnswers[row.col1]}
+              index={index}
+              subIndex={row.col1}
+              filter={filter}
+            />
+          </Grid>
+          <Grid item xs={12} md={6} lg={6}>
+            <SubChart
+              subAnswers={groupedAnswers[row.col2]}
+              index={index}
+              subIndex={row.col2}
+              filter={filter}
+            />
+          </Grid>
+        </Grid>
       ))}
-    </Grid>
+    </>
   )
 }
