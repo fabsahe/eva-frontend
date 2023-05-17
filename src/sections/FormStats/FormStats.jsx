@@ -54,7 +54,12 @@ export default function FormStats() {
         <Radios answers={answerList} index={index} filter={memoFilter} />
       ),
       checkboxes: (
-        <Checkboxes answers={answerList} index={index} filter={memoFilter} />
+        <Checkboxes
+          subQuestions={subQuestions}
+          answers={answerList}
+          index={index}
+          filter={memoFilter}
+        />
       ),
       scale: <Scale answers={answerList} index={index} filter={memoFilter} />,
       grid: (

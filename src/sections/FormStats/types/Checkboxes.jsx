@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import {
@@ -11,7 +11,6 @@ import {
   Legend
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
-import randomColor from 'randomcolor'
 import { useDownload, useChartActions } from '../../../store/chartStore'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
@@ -30,7 +29,7 @@ const plugin = {
 
 const options = {
   responsive: true,
-  barThickness: 80,
+
   plugins: {
     legend: {
       display: false
@@ -41,38 +40,43 @@ const options = {
   }
 }
 
-const generateRandomColors = (count) => {
-  return randomColor({
-    count
-  })
-}
-
-export default function Checkboxes({ answers, index, filter }) {
+export default function Checkboxes({ subQuestions, answers, index }) {
   const chartRef = useRef(null)
 
   const download = useDownload()
   const { addImage } = useChartActions()
 
+  const total = answers.length
   const answersArr = answers.flat()
-  const map = answersArr.reduce(
-    (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-    new Map()
-  )
-  const keys = [...map.keys()]
-  const values = [...map.values()]
 
-  const colors = useMemo(
-    () => generateRandomColors(keys.length),
-    [keys.length, filter]
-  )
+  const answersCounter = answersArr.reduce((acc, elemento) => {
+    acc[elemento] = (acc[elemento] || 0) + 1
+    return acc
+  }, {})
+
+  const yesData = subQuestions.map((element) => {
+    if (element in answersCounter) {
+      return answersCounter[element]
+    }
+    return 0
+  })
+  const noData = yesData.map((element) => {
+    return total - element
+  })
 
   const data = {
-    labels: keys,
+    labels: subQuestions,
     datasets: [
       {
-        label: 'Respuestas',
-        data: values,
-        backgroundColor: colors,
+        label: 'No',
+        data: noData,
+        backgroundColor: 'rgba(255, 51, 97, 0.8)',
+        borderWidth: 1
+      },
+      {
+        label: 'Sí',
+        data: yesData,
+        backgroundColor: 'rgba(28, 176, 100, 0.8)',
         borderWidth: 1
       }
     ]
@@ -92,8 +96,7 @@ export default function Checkboxes({ answers, index, filter }) {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={1} lg={1} />
-      <Grid item xs={12} md={10} lg={10}>
+      <Grid item xs={12} md={10} lg={12}>
         <Box sx={{ pt: 0, px: 2, mb: 1 }}>
           <Bar
             ref={chartRef}
