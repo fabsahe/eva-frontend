@@ -43,6 +43,9 @@ const createDocument = (info, questions, answers, imageData) => {
       style: 'question',
       margin: [0, 20, 0, 8]
     }
+    if (question.type === 'grid') {
+      questionElement.pageBreak = 'before'
+    }
 
     let answersElement = null
     if (question.type === 'open-ended') {
@@ -52,14 +55,22 @@ const createDocument = (info, questions, answers, imageData) => {
     } else if (question.type === 'radios') {
       answersElement = {
         image: imageData.find((img) => img.index === questionIndex)?.data,
-        width: 190,
+        width: 320,
+        style: 'center',
+        margin: [0, 5, 0, 0]
+      }
+    } else if (question.type === 'dropdown') {
+      answersElement = {
+        image: imageData.find((img) => img.index === questionIndex)?.data,
+        width: 320,
         style: 'center'
       }
     } else if (question.type === 'checkboxes' || question.type === 'scale') {
       answersElement = {
         image: imageData.find((img) => img.index === questionIndex)?.data,
-        width: 350,
-        style: 'center'
+        width: 360,
+        style: 'center',
+        margin: [0, 15, 15, 0]
       }
     } else if (question.type === 'grid') {
       const subImages = imageData.filter((img) => img.index === questionIndex)
@@ -69,20 +80,29 @@ const createDocument = (info, questions, answers, imageData) => {
       }))
       const subQuestionImages = subImages.map((img) => ({
         image: img.data,
-        width: 180,
+        width: 400,
         style: 'center'
       }))
 
-      const mergedArr = subQuestionImages.reduce((acc, curr, index) => {
-        acc.push(subQuestionSentences[index], curr)
-        return acc
-      }, [])
+      const { length } = question.subQuestions
+      const mergedArr = []
+      // eslint-disable-next-line no-plusplus
+      for (let j = 0; j < length; j++) {
+        const subPair = {
+          stack: [subQuestionSentences[j], subQuestionImages[j]],
+          unbreakable: true
+        }
+        mergedArr.push(subPair)
+      }
       answersElement = {
-        ol: mergedArr
+        ul: mergedArr
       }
     }
-
-    return [questionElement, answersElement]
+    const pair = {
+      stack: [questionElement, answersElement],
+      unbreakable: question.type !== 'grid'
+    }
+    return pair
   })
 
   const orderedQueries = {
