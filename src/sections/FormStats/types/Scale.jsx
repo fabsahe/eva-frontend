@@ -11,8 +11,8 @@ import {
   Legend
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
-import randomColor from 'randomcolor'
 import { useDownload, useChartActions } from '../../../store/chartStore'
+import generateRandomColors from '../../../utils/randomColors'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
@@ -39,12 +39,6 @@ const options = {
       color: 'white'
     }
   }
-}
-
-const generateRandomColors = (count) => {
-  return randomColor({
-    count
-  })
 }
 
 export default function Scale({ answers, index, filter }) {

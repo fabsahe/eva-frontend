@@ -4,9 +4,9 @@ import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
-import randomColor from 'randomcolor'
 import { useDownload, useChartActions } from '../../../store/chartStore'
 import pieOptions from '../../../constants/pieOptions'
+import generateRandomColors from '../../../utils/randomColors'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -20,12 +20,6 @@ const plugin = {
     ctx.fillRect(0, 0, chart.width, chart.height)
     ctx.restore()
   }
-}
-
-const generateRandomColors = (count) => {
-  return randomColor({
-    count
-  })
 }
 
 export default function Radios({ answers, index, filter }) {
