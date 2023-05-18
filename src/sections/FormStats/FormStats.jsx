@@ -12,13 +12,14 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
-import answerService from '../../services/answerService'
+import Loader from '../../common/Loader'
 import Radios from './types/Radios'
 import Dropdown from './types/Dropdown'
 import Checkboxes from './types/Checkboxes'
 import Scale from './types/Scale'
 import RadioGrid from './types/RadioGrid'
 import OpenEnded from './types/OpenEnded'
+import answerService from '../../services/answerService'
 import { useImageData, useChartActions } from '../../store/chartStore'
 import createDocument from '../../utils/createDocument'
 
@@ -41,6 +42,7 @@ export default function FormStats() {
   const [professorList, setProfessorList] = useState([])
   const [groupList, setGroupList] = useState([])
   const [memoFilter, setMemoFilter] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const imageData = useImageData()
   const { startDownload, finishDownload } = useChartActions()
@@ -125,7 +127,12 @@ export default function FormStats() {
   }
 
   useEffect(() => {
-    getForm()
+    async function fetchData() {
+      setLoading(true)
+      await getForm()
+      setLoading(false)
+    }
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -183,119 +190,131 @@ export default function FormStats() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8} lg={8}>
-          <Paper
-            sx={{
-              p: 2,
-              mb: 3
-            }}
-          >
-            <Typography component="h1" variant="h5" sx={{ mb: 0.2 }}>
-              Respuestas para el cuestionario:
-            </Typography>
-            <Typography
-              component="span"
-              variant="h5"
+      {loading ? (
+        <Loader />
+      ) : (
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={8} lg={8}>
+            <Paper
               sx={{
-                color: '#6e851d',
-                borderBottom: '1px dashed'
+                p: 2,
+                mb: 3
               }}
             >
-              {title}
-            </Typography>
-          </Paper>
-
-          {questions &&
-            questions.map((question, index) => (
-              <Paper
-                key={question.id}
+              <Typography component="h1" variant="h5" sx={{ mb: 0.2 }}>
+                Respuestas para el cuestionario:
+              </Typography>
+              <Typography
+                component="span"
+                variant="h5"
                 sx={{
-                  p: 2,
-                  mb: 3,
-                  display: 'flex',
-                  flexDirection: 'column'
+                  color: '#6e851d',
+                  borderBottom: '1px dashed'
                 }}
               >
-                <Typography
-                  variant="subtitle1"
-                  component="h1"
-                  sx={{ mb: 0, fontWeight: 500, fontSize: 18 }}
+                {title}
+              </Typography>
+            </Paper>
+
+            {questions &&
+              questions.map((question, index) => (
+                <Paper
+                  key={question.id}
+                  sx={{
+                    p: 2,
+                    mb: 3,
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
                 >
-                  {`${index + 1}.- ${question.sentence}`}
-                </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    component="h1"
+                    sx={{ mb: 0, fontWeight: 500, fontSize: 18 }}
+                  >
+                    {`${index + 1}.- ${question.sentence}`}
+                  </Typography>
 
-                {answers &&
-                  getResult(
-                    index,
-                    question.type,
-                    question.labels ?? [],
-                    question.subQuestions ?? [],
-                    answers[question.id]
-                  )}
-              </Paper>
-            ))}
-        </Grid>
+                  {answers &&
+                    getResult(
+                      index,
+                      question.type,
+                      question.labels ?? [],
+                      question.subQuestions ?? [],
+                      answers[question.id]
+                    )}
+                </Paper>
+              ))}
+          </Grid>
 
-        <Grid item xs={12} md={4} lg={4}>
-          <Paper
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
-              Filtros
-            </Typography>
+          <Grid item xs={12} md={4} lg={4}>
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              <Typography component="h1" variant="h6" sx={{ mb: 2 }}>
+                Filtros
+              </Typography>
 
-            <FormControl fullWidth>
-              <InputLabel id="filter-type-select-label">Filtrar por</InputLabel>
-              <Select
-                labelId="filter-type-select-label"
-                id="filter-type-form-select"
-                value={filterType}
-                label="Filtrar por"
-                onChange={handleChangeFilterType}
-                required
-              >
-                <MenuItem value="all">Todas las respuestas</MenuItem>
-                <MenuItem value="career">Carrera</MenuItem>
-                <MenuItem value="professor">Profesor</MenuItem>
-                <MenuItem value="group">Grupo</MenuItem>
-              </Select>
-            </FormControl>
-            <Box sx={{ mb: 2 }} />
-
-            {filterType !== 'all' ? (
               <FormControl fullWidth>
-                <InputLabel id="filter-select-label">
-                  {filterLabel[filterType]}
+                <InputLabel id="filter-type-select-label">
+                  Filtrar por
                 </InputLabel>
                 <Select
-                  labelId="filter-select-label"
-                  id="filter-form-select"
-                  label={filterLabel[filterType]}
-                  value={filter}
-                  onChange={handleChangeFilter}
+                  labelId="filter-type-select-label"
+                  id="filter-type-form-select"
+                  value={filterType}
+                  label="Filtrar por"
+                  onChange={handleChangeFilterType}
                   required
                 >
-                  {filterList &&
-                    filterList.map((item) => (
-                      <MenuItem key={item._id} value={item._id}>
-                        {item.nombre}
-                      </MenuItem>
-                    ))}
+                  <MenuItem value="all">Todas las respuestas</MenuItem>
+                  <MenuItem value="career">Carrera</MenuItem>
+                  <MenuItem value="professor">Profesor</MenuItem>
+                  <MenuItem value="group">Grupo</MenuItem>
                 </Select>
               </FormControl>
-            ) : null}
-          </Paper>
-        </Grid>
-      </Grid>
+              <Box sx={{ mb: 2 }} />
 
-      <Button variant="contained" color="success" onClick={handleGeneratePdf}>
-        Descargar
-      </Button>
+              {filterType !== 'all' ? (
+                <FormControl fullWidth>
+                  <InputLabel id="filter-select-label">
+                    {filterLabel[filterType]}
+                  </InputLabel>
+                  <Select
+                    labelId="filter-select-label"
+                    id="filter-form-select"
+                    label={filterLabel[filterType]}
+                    value={filter}
+                    onChange={handleChangeFilter}
+                    required
+                  >
+                    {filterList &&
+                      filterList.map((item) => (
+                        <MenuItem key={item._id} value={item._id}>
+                          {item.nombre}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              ) : null}
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={4} lg={4} sx={{ mt: -3 }}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleGeneratePdf}
+            >
+              Descargar
+            </Button>
+          </Grid>
+        </Grid>
+      )}
     </Container>
   )
 }
