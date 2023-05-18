@@ -9,9 +9,10 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
+// import Button from '@mui/material/Button'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
+import Downloads from './Downloads'
 import Loader from '../../common/Loader'
 import Radios from './types/Radios'
 import Dropdown from './types/Dropdown'
@@ -245,12 +246,24 @@ export default function FormStats() {
                     )}
                 </Paper>
               ))}
+
+            <Downloads
+              generatePdf={handleGeneratePdf}
+              generateXlsx={handleGeneratePdf}
+            />
           </Grid>
 
-          <Grid item xs={12} md={4} lg={4}>
+          <Grid
+            item
+            xs={12}
+            md={4}
+            lg={4}
+            style={{ position: 'fixed', top: 72, right: '2rem' }}
+          >
             <Paper
               sx={{
                 p: 2,
+                width: '22rem',
                 display: 'flex',
                 flexDirection: 'column'
               }}
@@ -302,16 +315,6 @@ export default function FormStats() {
                 </FormControl>
               ) : null}
             </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4} lg={4} sx={{ mt: -3 }}>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleGeneratePdf}
-            >
-              Descargar
-            </Button>
           </Grid>
         </Grid>
       )}
