@@ -29,6 +29,7 @@
     "react-dom": "18.2.0",
     "react-router-dom": "6.10.0",
     "validator": "13.9.0",
+    "write-excel-file": "1.4.26",
     "zustand": "4.3.7"
   },
   "devDependencies": {

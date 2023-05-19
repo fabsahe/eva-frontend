@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
@@ -9,9 +10,10 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
-// import Button from '@mui/material/Button'
+import Button from '@mui/material/Button'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
+import writeXlsxFile from 'write-excel-file'
 import Downloads from './Downloads'
 import Loader from '../../common/Loader'
 import Radios from './types/Radios'
@@ -22,7 +24,14 @@ import RadioGrid from './types/RadioGrid'
 import OpenEnded from './types/OpenEnded'
 import answerService from '../../services/answerService'
 import { useImageData, useChartActions } from '../../store/chartStore'
+import generateFileName from '../../utils/fileName'
 import createDocument from '../../utils/createDocument'
+import {
+  createTable,
+  createColumns,
+  generateXlsxQuestions
+} from '../../utils/createXlsx'
+import INFO_COL_NAMES from '../../constants/infoColNames'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -127,6 +136,21 @@ export default function FormStats() {
     startDownload()
   }
 
+  const handleGenerateXlsx = async () => {
+    const XLSX_DOWNLOAD = 1
+    const xlsxQuestions = generateXlsxQuestions(questions)
+    const tableData = createTable(xlsxQuestions)
+    const columns = createColumns(xlsxQuestions)
+    const fileName = generateFileName(title, 'xlsx')
+    if (XLSX_DOWNLOAD !== 0) {
+      await writeXlsxFile(tableData, {
+        columns,
+        fileName,
+        fontSize: 11
+      })
+    }
+  }
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true)
@@ -158,25 +182,13 @@ export default function FormStats() {
 
   useEffect(() => {
     if (imageData.length > 0) {
-      const invalidCharsRegex = /[^\w\s]/gi // expresión regular que busca todos los caracteres no válidos
-      const formattedTitle = title
-        .toLocaleLowerCase()
-        .replace('á', 'a')
-        .replace('é', 'e')
-        .replace('í', 'i')
-        .replace('ó', 'o')
-        .replace('ú', 'u')
-      const fileName = formattedTitle
-        .replace(invalidCharsRegex, '_')
-        .replace(/\s+/g, '_')
-
+      const fileName = generateFileName(title, 'pdf')
       const infoPDF = {
         title,
         filterType,
         filterList,
         filter
       }
-
       const docDefinition = createDocument(
         infoPDF,
         questions,
@@ -184,7 +196,7 @@ export default function FormStats() {
         imageData
       )
 
-      pdfMake.createPdf(docDefinition).download(`${fileName}.pdf`)
+      pdfMake.createPdf(docDefinition).download(fileName)
       finishDownload()
     }
   }, [imageData])
@@ -249,7 +261,7 @@ export default function FormStats() {
 
             <Downloads
               generatePdf={handleGeneratePdf}
-              generateXlsx={handleGeneratePdf}
+              generateXlsx={handleGenerateXlsx}
             />
           </Grid>
 
@@ -258,7 +270,7 @@ export default function FormStats() {
             xs={12}
             md={4}
             lg={4}
-            style={{ position: 'fixed', top: 72, right: '2rem' }}
+            style={{ position: 'fixed', top: '4.5rem', right: '2rem' }}
           >
             <Paper
               sx={{
@@ -314,6 +326,15 @@ export default function FormStats() {
                   </Select>
                 </FormControl>
               ) : null}
+
+              <Button
+                variant="contained"
+                color="info"
+                sx={{ mt: 1 }}
+                onClick={handleGenerateXlsx}
+              >
+                Descargar XLSX
+              </Button>
             </Paper>
           </Grid>
         </Grid>

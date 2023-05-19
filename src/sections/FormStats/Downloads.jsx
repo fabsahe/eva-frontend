@@ -6,7 +6,7 @@ import Button from '@mui/material/Button'
 
 export default function Downloads({ generatePdf, generateXlsx }) {
   return (
-    <Grid container sx={{ mb: 0.5 }}>
+    <Grid container>
       <Grid item xs={12} md={6} lg={6}>
         <Button variant="contained" color="success" onClick={generatePdf}>
           Descargar PDF
