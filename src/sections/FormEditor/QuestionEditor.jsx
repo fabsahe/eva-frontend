@@ -25,6 +25,7 @@ import {
   useOptions,
   useFormActions
 } from '../../store/formStore'
+import cleanOptions from '../../utils/cleanOptions'
 
 const typeEditor = {
   'open-ended': null,
@@ -57,24 +58,29 @@ export default function QuestionEditor() {
     setQuestionSentence(event.target.value)
   }
 
-  const newQuestion = () => {
+  const newQuestion = (formattedSentence, formattedOptions) => {
     const prevQuestions = questions
     const key = questions.length === 0 ? 0 : questions.at(-1).key + 1
     const newQuestions = [
       ...prevQuestions,
-      { key, sentence: questionSentence, type: questionType, options }
+      {
+        key,
+        sentence: formattedSentence,
+        type: questionType,
+        options: formattedOptions
+      }
     ]
     setQuestions(newQuestions)
   }
 
-  const updateQuestion = () => {
+  const updateQuestion = (formattedSentence, formattedOptions) => {
     const questionIndex = questions.findIndex(
       (question) => question.key === questionToEdit
     )
     const updatedQuestions = [...questions]
-    updatedQuestions[questionIndex].sentence = questionSentence
+    updatedQuestions[questionIndex].sentence = formattedSentence
     updatedQuestions[questionIndex].type = questionType
-    updatedQuestions[questionIndex].options = { ...options }
+    updatedQuestions[questionIndex].options = { ...formattedOptions }
 
     setQuestions(updatedQuestions)
   }
@@ -84,10 +90,13 @@ export default function QuestionEditor() {
       noti('Faltan datos')
       return
     }
+    const formattedSentence = questionSentence.trim()
+    const formattedOptions = cleanOptions(options)
+
     if (questionMode === 'new') {
-      newQuestion()
+      newQuestion(formattedSentence, formattedOptions)
     } else if (questionMode === 'edit') {
-      updateQuestion()
+      updateQuestion(formattedSentence, formattedOptions)
     }
     resetQuestion()
   }
