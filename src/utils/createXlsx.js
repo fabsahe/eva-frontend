@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
 import INFO_COL_NAMES from '../constants/infoColNames'
+import timestampService from '../services/timestampService'
 
 const COL_NAMES_ALIGN_V = 'bottom'
 const BORDER_COLOR = '#9A9A9A'
@@ -49,7 +51,11 @@ export const generateXlsxQuestions = (questions) => {
   return xlsxQuestions
 }
 
-export const createTable = (questions) => {
+export const createTable = async (questions, filterType, filterValue) => {
+  const filter = {
+    [filterType]: filterValue
+  }
+
   /*  Generación de la fila de cabecera, 
       conformada por los enunciados de cada pregunta */
   const infoCols = INFO_COL_NAMES.map((item) => ({
@@ -107,7 +113,35 @@ export const createTable = (questions) => {
   })
   const optionsRow = initialSpan.concat(optionCols)
 
-  const data = [headerRow, optionsRow]
+  /* Recuperación de respuestas por marcas de tiempo */
+  const response = await timestampService.getTimestamps(filter)
+
+  const timestamps = response.data
+
+  const answerRows = timestamps.map((timestamp) => {
+    const currentAnswerRow = [null, null, null, null]
+    questions.forEach((question) => {
+      const currentAnswerObj = timestamp.answers.find(
+        (ans) => ans.question === question.id
+      )
+      const currentAnswers = currentAnswerObj.answers
+      if (question.type === 'checkboxes') {
+        const checkAns = question.subSentences.map((element) =>
+          currentAnswers.includes(element) ? 'Sí' : 'No'
+        )
+        checkAns.forEach((element) => {
+          currentAnswerRow.push({ value: element })
+        })
+      } else {
+        currentAnswers.forEach((element) => {
+          currentAnswerRow.push({ value: element })
+        })
+      }
+    })
+    return currentAnswerRow
+  })
+
+  const data = [headerRow, optionsRow, ...answerRows]
 
   return data
 }

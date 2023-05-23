@@ -137,12 +137,12 @@ export default function FormStats() {
   }
 
   const handleGenerateXlsx = async () => {
-    const XLSX_DOWNLOAD = 1
+    const XLSX_DOWNLOAD = true
     const xlsxQuestions = generateXlsxQuestions(questions)
-    const tableData = createTable(xlsxQuestions)
+    const tableData = await createTable(xlsxQuestions, filterType, filter)
     const columns = createColumns(xlsxQuestions)
     const fileName = generateFileName(title, 'xlsx')
-    if (XLSX_DOWNLOAD !== 0) {
+    if (XLSX_DOWNLOAD) {
       await writeXlsxFile(tableData, {
         columns,
         fileName,
