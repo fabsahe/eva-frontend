@@ -76,10 +76,21 @@ export default function FormViewer() {
     const answersToValidate = answers.filter((answer) =>
       questionsToValidate.includes(answer.question)
     )
-    const validations = answersToValidate.map((answer) => ({
-      question: answer.question,
-      error: answer.answers.length === 0
-    }))
+    const validations = answersToValidate.map((answer) => {
+      const currentQuestion = questions.find((q) => q._id === answer.question)
+      if (currentQuestion.type === 'grid') {
+        const total = currentQuestion.options.rows.length
+        const catched = answer.answers.length
+        return {
+          question: answer.question,
+          error: total !== catched
+        }
+      }
+      return {
+        question: answer.question,
+        error: answer.answers.length === 0
+      }
+    })
     const errors = validations.reduce((acc, { question, error }) => {
       acc[question] = error
       return acc
