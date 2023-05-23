@@ -9,6 +9,7 @@ const useFormViewerStore = create((set) => ({
   career: '',
   group: '',
   professor: '',
+  subject: '',
   questions: [],
   answers: [],
   actions: {
@@ -20,6 +21,7 @@ const useFormViewerStore = create((set) => ({
     setCareer: (value) => set({ career: value }),
     setGroup: (value) => set({ group: value }),
     setProfessor: (value) => set({ professor: value }),
+    setSubject: (value) => set({ subject: value }),
     setQuestions: (newQuestions) => set({ questions: newQuestions }),
     setAnswers: (newAnswers) => set({ answers: newAnswers })
   }
@@ -33,6 +35,7 @@ export const usePeriod = () => useFormViewerStore((state) => state.period)
 export const useCareer = () => useFormViewerStore((state) => state.career)
 export const useGroup = () => useFormViewerStore((state) => state.group)
 export const useProfessor = () => useFormViewerStore((state) => state.professor)
+export const useSubject = () => useFormViewerStore((state) => state.subject)
 export const useQuestions = () => useFormViewerStore((state) => state.questions)
 export const useAnswers = () => useFormViewerStore((state) => state.answers)
 export const useFormViewerActions = () =>

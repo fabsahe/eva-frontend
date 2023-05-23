@@ -37,7 +37,7 @@ export default function FormStepper() {
   const career = useCareer()
   const group = useGroup()
   const professor = useProfessor()
-  const { setSection, setCareer, setGroup, setProfessor } =
+  const { setSection, setCareer, setGroup, setProfessor, setSubject } =
     useFormViewerActions()
 
   const getNumberByTokens = (tokens) => {
@@ -93,7 +93,12 @@ export default function FormStepper() {
   }
 
   const handleChangeProfessor = (event) => {
+    const currentProfessor = professors.find(
+      (element) => element.profesor._id === event.target.value
+    )
+    const currentSubject = currentProfessor.materia._id
     setProfessor(event.target.value)
+    setSubject(currentSubject)
   }
 
   const handleBack = () => {

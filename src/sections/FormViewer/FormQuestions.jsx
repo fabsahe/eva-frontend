@@ -20,6 +20,7 @@ import {
   useCareer,
   useGroup,
   useProfessor,
+  useSubject,
   useQuestions,
   useAnswers,
   useFormViewerActions
@@ -49,6 +50,7 @@ export default function FormViewer() {
   const career = useCareer()
   const group = useGroup()
   const professor = useProfessor()
+  const subject = useSubject()
   const questions = useQuestions()
   const answers = useAnswers()
 
@@ -112,6 +114,7 @@ export default function FormViewer() {
       career,
       group,
       professor,
+      subject,
       question: answer.question,
       answers: answer.answers
     }))

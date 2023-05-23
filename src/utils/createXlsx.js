@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
 import INFO_COL_NAMES from '../constants/infoColNames'
+import MONTH_NAMES from '../constants/months'
 import timestampService from '../services/timestampService'
 
 const COL_NAMES_ALIGN_V = 'bottom'
@@ -32,6 +33,13 @@ function getBorderColor(type) {
     return null
   }
   return BORDER_COLOR
+}
+
+function timeFormat(value) {
+  if (value < 10) {
+    return `0${value}`
+  }
+  return value
 }
 
 export const generateXlsxQuestions = (questions) => {
@@ -119,7 +127,22 @@ export const createTable = async (questions, filterType, filterValue) => {
   const timestamps = response.data
 
   const answerRows = timestamps.map((timestamp) => {
-    const currentAnswerRow = [null, null, null, null]
+    const currentAnswerRow = []
+
+    const dateObj = new Date(timestamp.createdAt)
+    const day = dateObj.getDate()
+    const month = MONTH_NAMES[dateObj.getMonth()]
+    const year = dateObj.getFullYear()
+    const hours = timeFormat(dateObj.getHours())
+    const minutes = timeFormat(dateObj.getMinutes())
+    const seconds = timeFormat(dateObj.getSeconds())
+    const dateStr = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
+
+    currentAnswerRow.push({ value: dateStr })
+    currentAnswerRow.push({ value: timestamp.professor.nombre })
+    currentAnswerRow.push({ value: timestamp.subject.nombre })
+    currentAnswerRow.push({ value: timestamp.group })
+
     questions.forEach((question) => {
       const currentAnswerObj = timestamp.answers.find(
         (ans) => ans.question === question.id
