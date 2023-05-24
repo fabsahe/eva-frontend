@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react'
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
@@ -124,7 +125,7 @@ export default function FormStepper() {
   }
 
   return (
-    <Box>
+    <Paper sx={{ p: 2 }}>
       <Stepper activeStep={activeStep}>
         {steps.map((label) => {
           const stepProps = {}
@@ -235,6 +236,6 @@ export default function FormStepper() {
           </Box>
         </>
       )}
-    </Box>
+    </Paper>
   )
 }

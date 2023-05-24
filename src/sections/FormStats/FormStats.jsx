@@ -327,14 +327,14 @@ export default function FormStats() {
                 </FormControl>
               ) : null}
 
-              <Button
+              {/* <Button
                 variant="contained"
                 color="info"
                 sx={{ mt: 1 }}
                 onClick={handleGenerateXlsx}
               >
                 Descargar XLSX
-              </Button>
+                      </Button> */}
             </Paper>
           </Grid>
         </Grid>

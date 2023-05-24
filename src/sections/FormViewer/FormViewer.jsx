@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
+import CssBaseline from '@mui/material/CssBaseline'
+// import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import Loader from '../../common/Loader'
@@ -14,7 +17,7 @@ const sectionMap = {
   stepper: <FormStepper />,
   questions: <FormQuestions />,
   finished: (
-    <Typography component="h1" variant="h4">
+    <Typography variant="h5" component="h1">
       Las respuestas se han enviado
     </Typography>
   )
@@ -72,36 +75,44 @@ export default function FormViewer() {
   }, [])
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ backgroundColor: '#F1F5F6' }}>
+      <CssBaseline />
       <FormBar />
 
       {loading ? (
-        <Box component="main" sx={{ flexGrow: 1, mt: 9 }}>
+        <Container component="main" maxWidth="md" sx={{ mb: 4 }}>
           <Loader />
-        </Box>
+        </Container>
       ) : (
-        <Box
+        <Container
           component="main"
-          sx={{
-            flexGrow: 1,
-            minHeight: '80vh'
-          }}
+          maxWidth="md"
+          sx={{ pt: 10, mb: 0, minHeight: '100vh' }}
         >
           {visible ? (
-            <Container maxWidth="md" sx={{ mt: 9 }}>
-              <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
-                {title}
-              </Typography>
+            <>
+              <Paper
+                sx={{
+                  mb: 2,
+                  px: 2,
+                  pt: 1.2,
+                  pb: 1,
+                  borderTop: '10px solid #346187'
+                }}
+              >
+                <Typography variant="h4" component="h1" sx={{ fontSize: 32 }}>
+                  {title}
+                </Typography>
+              </Paper>
+
               {sectionMap[section] ?? null}
-            </Container>
+            </>
           ) : (
-            <Container maxWidth="md" sx={{ mt: 9 }}>
-              <Typography component="h1" variant="h4">
-                El cuestionario no se encuentra activo
-              </Typography>
-            </Container>
+            <Typography component="h1" variant="h4">
+              El cuestionario no se encuentra activo
+            </Typography>
           )}
-        </Box>
+        </Container>
       )}
     </Box>
   )

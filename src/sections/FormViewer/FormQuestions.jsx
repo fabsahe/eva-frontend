@@ -146,14 +146,11 @@ export default function FormViewer() {
 
       {questions.map((question, index) => (
         <Grid item key={question._id} md={12} lg={12}>
-          <Paper
-            sx={!errorList[question._id] ? normalPaper : errorPaper}
-            variant="outlined"
-          >
+          <Paper sx={!errorList[question._id] ? normalPaper : errorPaper}>
             <Typography
               variant="subtitle1"
               component="h1"
-              sx={{ mb: 0.7, fontWeight: 500, fontSize: 18 }}
+              sx={{ mb: 0.7, fontWeight: 500, fontSize: 17 }}
             >
               {`${index + 1}.- ${question.sentence}`}
             </Typography>
@@ -187,7 +184,11 @@ export default function FormViewer() {
           justifyContent="flex-end"
           alignItems="flex-end"
         >
-          <Button variant="contained" color="avocado" onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            color="lapizlazuli"
+            onClick={handleSubmit}
+          >
             Enviar respuestas
           </Button>
         </Box>

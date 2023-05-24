@@ -12,6 +12,11 @@ const evaTheme = createTheme({
       main: '#69a644',
       contrastText: '#fff'
     },
+    lapizlazuli: {
+      main: '#346187',
+      dark: '#264969',
+      contrastText: '#eee'
+    },
     avocado: {
       main: '#6e851d',
       dark: '#5E7119',
