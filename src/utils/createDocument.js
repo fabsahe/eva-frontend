@@ -55,14 +55,14 @@ const createDocument = (info, questions, answers, imageData) => {
     } else if (question.type === 'radios') {
       answersElement = {
         image: imageData.find((img) => img.index === questionIndex)?.data,
-        width: 320,
+        width: 340,
         style: 'center',
         margin: [0, 5, 0, 0]
       }
     } else if (question.type === 'dropdown') {
       answersElement = {
         image: imageData.find((img) => img.index === questionIndex)?.data,
-        width: 320,
+        width: 340,
         style: 'center'
       }
     } else if (question.type === 'checkboxes' || question.type === 'scale') {
@@ -80,7 +80,7 @@ const createDocument = (info, questions, answers, imageData) => {
       }))
       const subQuestionImages = subImages.map((img) => ({
         image: img.data,
-        width: 400,
+        width: 410,
         style: 'center'
       }))
 

@@ -146,7 +146,8 @@ export default function FormStats() {
       await writeXlsxFile(tableData, {
         columns,
         fileName,
-        fontSize: 11
+        fontSize: 11,
+        sheet: 'Respuestas'
       })
     }
   }
