@@ -106,41 +106,41 @@ export default function FormStepper() {
     setActiveStep((prevActiveStep) => prevActiveStep - 1)
   }
 
-  const handleNextGroups = () => {
-    if (career) {
-      setActiveStep(1)
+  const handleNext = () => {
+    if (activeStep === 0) {
+      if (career) {
+        setActiveStep(1)
+      }
     }
-  }
-
-  const handleNextProfessors = () => {
-    if (group) {
-      setActiveStep(2)
+    if (activeStep === 1) {
+      if (group) {
+        setActiveStep(2)
+      }
     }
-  }
-
-  const handleStart = () => {
-    if (professor) {
-      setSection('questions')
+    if (activeStep === 2) {
+      if (professor) {
+        setSection('questions')
+      }
     }
   }
 
   return (
-    <Paper sx={{ p: 2 }}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label) => {
-          const stepProps = {}
-          const labelProps = {}
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          )
-        })}
-      </Stepper>
-      <Box sx={{ mb: 2 }} />
+    <>
+      <Paper sx={{ p: 2 }}>
+        <Stepper activeStep={activeStep}>
+          {steps.map((label) => {
+            const stepProps = {}
+            const labelProps = {}
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            )
+          })}
+        </Stepper>
+        <Box sx={{ mb: 2 }} />
 
-      {activeStep === 0 && (
-        <>
+        {activeStep === 0 && (
           <FormControl fullWidth>
             <InputLabel id="career-select-label">Carrera</InputLabel>
             <Select
@@ -158,15 +158,9 @@ export default function FormStepper() {
               ))}
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNextGroups}>Continuar</Button>
-          </Box>
-        </>
-      )}
+        )}
 
-      {activeStep === 1 && (
-        <>
+        {activeStep === 1 && (
           <FormControl fullWidth>
             <InputLabel id="group-select-label">Grupo</InputLabel>
             <Select
@@ -184,23 +178,9 @@ export default function FormStepper() {
               ))}
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Regresar
-            </Button>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNextProfessors}>Continuar</Button>
-          </Box>
-        </>
-      )}
+        )}
 
-      {activeStep === 2 && (
-        <>
+        {activeStep === 2 && (
           <FormControl fullWidth>
             <InputLabel id="professor-select-label">Profesor</InputLabel>
             <Select
@@ -222,20 +202,20 @@ export default function FormStepper() {
                 ))}
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Regresar
-            </Button>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleStart}>Continuar</Button>
-          </Box>
-        </>
-      )}
-    </Paper>
+        )}
+      </Paper>
+      <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+        <Button
+          color="inherit"
+          disabled={activeStep === 0}
+          onClick={handleBack}
+          sx={{ mr: 1 }}
+        >
+          Regresar
+        </Button>
+        <Box sx={{ flex: '1 1 auto' }} />
+        <Button onClick={handleNext}>Continuar</Button>
+      </Box>
+    </>
   )
 }
