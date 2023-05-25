@@ -29,10 +29,10 @@ const plugin = {
 
 const chartOptions = {
   responsive: true,
-
+  aspectRatio: 1.8,
   plugins: {
     legend: {
-      display: false
+      position: 'top'
     },
     customCanvasBackgroundColor: {
       color: 'white'
@@ -96,7 +96,7 @@ export default function Checkboxes({ index, labels, answers }) {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={10} lg={12}>
+      <Grid item xs={12} md={12} lg={12}>
         <Box sx={{ pt: 0, px: 2, mb: 1 }}>
           <Bar
             ref={chartRef}

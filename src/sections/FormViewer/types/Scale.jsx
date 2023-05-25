@@ -31,7 +31,7 @@ export default function Scale({ questionId, options }) {
   const getString = (value) => {
     const step = scale[1].value - scale[0].value
     const firstValue = value - step + (value === step ? 0 : 1)
-    return `De ${firstValue}% a ${value}%`
+    return `${firstValue}% - ${value}%`
   }
 
   const handleChangeAnswer = (value) => {
