@@ -7,4 +7,8 @@ services:
     ports:
       - 8080:8000
     working_dir: /srv/app
+    volumes:
+      - type: bind
+        source: ./
+        target: /srv/app
     tty: true
