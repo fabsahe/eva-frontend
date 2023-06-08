@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
@@ -10,9 +9,9 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
+// import Button from '@mui/material/Button'
 import pdfMake from 'pdfmake/build/pdfmake'
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 import writeXlsxFile from 'write-excel-file'
 import Downloads from './Downloads'
 import Loader from '../../common/Loader'
@@ -31,9 +30,19 @@ import {
   createColumns,
   generateXlsxQuestions
 } from '../../utils/createXlsx'
-import INFO_COL_NAMES from '../../constants/infoColNames'
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+pdfMake.fonts = {
+  // download default Roboto font from cdnjs.com
+  Roboto: {
+    normal:
+      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+    italics:
+      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+    bolditalics:
+      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+  }
+}
 
 const filterLabel = {
   career: 'Carrera',
@@ -196,6 +205,9 @@ export default function FormStats() {
         answers,
         imageData
       )
+      docDefinition.defaultStyle = {
+        font: 'Roboto'
+      }
 
       pdfMake.createPdf(docDefinition).download(fileName)
       finishDownload()
