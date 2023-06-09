@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate, useParams } from 'react-router-dom'
-import Button from '@mui/material/Button'
+import LoadingButton from '@mui/lab/LoadingButton'
+// import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -41,6 +42,7 @@ export default function FormEditor({ mode }) {
   const [careerList, setCareerList] = useState([])
   const [periodList, setPeriodList] = useState([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   const bottomRef = useRef(null)
 
@@ -165,6 +167,8 @@ export default function FormEditor({ mode }) {
       noti('El cuestionario está vacío', NOTI_ERROR)
       return
     }
+
+    setSaving(true)
     const formIdToCheck = mode === 'clone' ? null : formId
     const isAvailable = await formService.availableTitle(
       title.trim(),
@@ -194,11 +198,12 @@ export default function FormEditor({ mode }) {
     }
 
     if (mode === 'create' || mode === 'clone') {
-      createNewForm(newForm)
+      await createNewForm(newForm)
     } else if (mode === 'edit') {
       newForm.isEmpty = emptyForm
-      updateOneForm(newForm)
+      await updateOneForm(newForm)
     }
+    setSaving(false)
   }
 
   useEffect(() => {
@@ -254,7 +259,9 @@ export default function FormEditor({ mode }) {
             <div ref={bottomRef} style={{ scrollMargin: 80 }} />
             {emptyForm ? <QuestionEditor /> : null}
 
-            <Button
+            <LoadingButton
+              loading={saving}
+              loadingPosition="start"
               type="submit"
               fullWidth
               variant="contained"
@@ -262,7 +269,7 @@ export default function FormEditor({ mode }) {
               sx={{ mt: 3, mb: 2 }}
             >
               {submitButtonText}
-            </Button>
+            </LoadingButton>
           </Box>
 
           <Box sx={{ mt: 4 }} />
