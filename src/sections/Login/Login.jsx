@@ -14,6 +14,7 @@ import Alert from '@mui/material/Alert'
 import EmailField from './inputs/EmailField'
 import PasswordField from './inputs/PasswordField'
 import { useAuth } from '../../context/AuthContext'
+import careerService from '../../services/careerService'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -23,6 +24,7 @@ export default function Login() {
   const [user, setUser] = useState(null)
   const [authenticated, setAuthenticated] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [check, setCheck] = useState(null)
 
   const { login } = useAuth()
 
@@ -42,6 +44,16 @@ export default function Login() {
       }, 5000)
     }
   }
+
+  const checkDB = async () => {
+    const response = await careerService.getAllCareers()
+    const { data } = response
+    setCheck(data)
+  }
+
+  useEffect(() => {
+    checkDB()
+  }, [])
 
   return (
     <Container component="main" maxWidth="xs">
@@ -102,6 +114,12 @@ export default function Login() {
           </Button>
         </Box>
 
+        {check &&
+          check.map((item) => (
+            <Typography key={item._id} variant="body2" component="div">
+              {item.nombre}
+            </Typography>
+          ))}
         {/* <Grid container spacing={2}>
                 <Grid item xs>
                   <Button
