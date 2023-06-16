@@ -13,6 +13,7 @@ import Chip from '@mui/material/Chip'
 import Snackbar from '@mui/material/Snackbar'
 import dayjs from 'dayjs'
 import { useModalDetails, useFormActions } from '../../store/formListStore'
+import WEB_APP_URL from '../../constants/appUrl'
 
 const styles = {
   header1: {
@@ -38,7 +39,7 @@ export default function FormDetails({ form }) {
   const modalDetails = useModalDetails()
   const { hideModalDetails } = useFormActions()
 
-  const formURL = `http://localhost:5173/cuestionarios/${form._id}`
+  const formURL = `http://${WEB_APP_URL}/cuestionarios/${form._id}`
 
   const handleClose = () => {
     hideModalDetails()
@@ -50,6 +51,7 @@ export default function FormDetails({ form }) {
       await navigator.clipboard.writeText(formURL)
       setUrlCopied(true)
     } catch (err) {
+      console.log(err)
       console.error('NO COPIADO :(')
     }
   }
