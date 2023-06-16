@@ -14,7 +14,7 @@ import Alert from '@mui/material/Alert'
 import EmailField from './inputs/EmailField'
 import PasswordField from './inputs/PasswordField'
 import { useAuth } from '../../context/AuthContext'
-import careerService from '../../services/careerService'
+import versionService from '../../services/versionService'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -24,7 +24,7 @@ export default function Login() {
   const [user, setUser] = useState(null)
   const [authenticated, setAuthenticated] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [check, setCheck] = useState(null)
+  const [version, setVersion] = useState(null)
 
   const { login } = useAuth()
 
@@ -45,14 +45,15 @@ export default function Login() {
     }
   }
 
-  const checkDB = async () => {
-    const response = await careerService.getAllCareers()
-    const { data } = response
-    setCheck(data)
+  const checkVersion = async () => {
+    const versionResponse = await versionService.getVersion()
+    if (versionResponse) {
+      setVersion(`Ver. ${versionResponse.code}`)
+    }
   }
 
   useEffect(() => {
-    checkDB()
+    checkVersion()
   }, [])
 
   return (
@@ -114,12 +115,6 @@ export default function Login() {
           </Button>
         </Box>
 
-        {check &&
-          check.map((item) => (
-            <Typography key={item._id} variant="body2" component="div">
-              {item.nombre}
-            </Typography>
-          ))}
         {/* <Grid container spacing={2}>
                 <Grid item xs>
                   <Button
@@ -153,6 +148,14 @@ export default function Login() {
                 </Grid>
                   </Grid> */}
       </Box>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        align="center"
+        sx={{ mt: 8 }}
+      >
+        {version}
+      </Typography>
     </Container>
   )
 }
