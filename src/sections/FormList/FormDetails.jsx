@@ -51,8 +51,13 @@ export default function FormDetails({ form }) {
       await navigator.clipboard.writeText(formURL)
       setUrlCopied(true)
     } catch (err) {
-      console.log(err)
-      console.error('NO COPIADO :(')
+      try {
+        document.execCommand('copy', true, formURL)
+        console.warn('Copia no segura')
+        setUrlCopied(true)
+      } catch (err2) {
+        console.error(err2)
+      }
     }
   }
 
