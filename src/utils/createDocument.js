@@ -26,14 +26,17 @@ const createDocument = (info, questions, answers, imageData) => {
 
   const foundFilter = filterList.find((item) => item._id === filter)
   const filterName = foundFilter.nombre
-  const filterTypeText = filterPDF[filterType]
+  const filterTypeText = filterPDF[filterType] || ''
 
   const header = {
-    text: `Respuestas para el cuestionario ${title}\n`,
+    text: `Respuestas para el cuestionario:\n${title}\n`,
     style: 'header'
   }
   const subheader = {
-    text: `Filtradas para ${filterTypeText}: ${filterName}`,
+    text:
+      filterType === 'all'
+        ? 'Filtradas para: todas las respuestas'
+        : `Filtradas para ${filterTypeText}: ${filterName}`,
     style: 'subheader'
   }
 

@@ -60,9 +60,13 @@ export const generateXlsxQuestions = (questions) => {
 }
 
 export const createTable = async (questions, filterType, filterValue) => {
-  const filter = {
-    [filterType]: filterValue
-  }
+  const allFilter = {}
+  const filter =
+    filterType === 'all'
+      ? allFilter
+      : {
+          [filterType]: filterValue
+        }
 
   /*  Generación de la fila de cabecera, 
       conformada por los enunciados de cada pregunta */
