@@ -51,13 +51,7 @@ export default function FormDetails({ form }) {
       await navigator.clipboard.writeText(formURL)
       setUrlCopied(true)
     } catch (err) {
-      try {
-        document.execCommand('copy', true, formURL)
-        console.warn('Copia no segura')
-        setUrlCopied(true)
-      } catch (err2) {
-        console.error(err2)
-      }
+      console.error('No se pudo copiar')
     }
   }
 
@@ -126,9 +120,11 @@ export default function FormDetails({ form }) {
             severity="success"
             icon={<LinkIcon fontSize="inherit" />}
             action={
-              <Button color="inherit" size="small" onClick={copyToClipboard}>
-                COPIAR
-              </Button>
+              window.isSecureContext ? (
+                <Button color="inherit" size="small" onClick={copyToClipboard}>
+                  COPIAR
+                </Button>
+              ) : null
             }
           >
             <Box sx={{ fontSize: 14, pr: 3 }}>{formURL}</Box>
